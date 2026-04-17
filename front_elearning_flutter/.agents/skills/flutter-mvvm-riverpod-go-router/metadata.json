@@ -1,0 +1,9 @@
+{
+  "name": "flutter-mvvm-riverpod-go-router",
+  "version": "1.0.0",
+  "description": "Agent skill pack for MVVM Flutter architecture with Riverpod, go_router, Dio and Result pattern.",
+  "organization": "project-team",
+  "language": "Dart",
+  "framework": "Flutter",
+  "generated": "2026-04-18"
+}
