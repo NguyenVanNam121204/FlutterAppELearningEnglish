@@ -1,6 +1,6 @@
 # Flutter MVVM Agent Guide
 
-Version 1.0.0
+Version 1.1.0
 
 This compiled guide is optimized for AI-assisted implementation in this
 repository.
@@ -23,6 +23,7 @@ Use these rules to keep code aligned with the project architecture:
 4. Routing and Navigation (HIGH)
 5. UI Composition (HIGH)
 6. Reliability and Async Safety (MEDIUM)
+7. Screen To Rule Map (REPORT)
 
 ## 1. Architecture Boundaries (CRITICAL)
 
@@ -82,6 +83,8 @@ Rules:
 - rules/reliability-no-blocking-in-build.md
 
 ## References
+
+- SCREEN_RULE_MAP.md
 
 - Flutter docs: https://docs.flutter.dev
 - Riverpod docs: https://riverpod.dev

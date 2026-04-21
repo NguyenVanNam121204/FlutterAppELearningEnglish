@@ -16,11 +16,12 @@ Deliver code that matches the existing architecture:
 
 1. Identify affected layer(s): view, viewmodel, repository, service, router.
 2. Keep responsibilities isolated by layer.
-3. Register new dependencies in lib/app/providers.dart.
-4. Use route constants from lib/app/router/route_paths.dart.
-5. Return Result<T> from repositories, never throw raw exceptions to UI.
-6. Update UI state only through immutable state objects and copyWith.
-7. Validate changes with analyzer/tests when possible.
+3. Register core dependencies in lib/app/providers.dart.
+4. Allow private screen-scoped providers only for screen-local read models.
+5. Use route constants from lib/app/router/route_paths.dart.
+6. Return Result<T> from repositories, never throw raw exceptions to UI.
+7. Update UI state only through immutable state objects and copyWith.
+8. Validate changes with analyzer/tests when possible.
 
 ## Hard Rules
 
@@ -29,6 +30,7 @@ Deliver code that matches the existing architecture:
 - Do not hardcode route strings when RoutePaths helper exists.
 - Do not bypass Result pattern in repository layer.
 - Do not mutate state collections in-place if they are part of state object.
+- Do not put app-wide service/repository providers inside screen files.
 
 ## UX Rules
 

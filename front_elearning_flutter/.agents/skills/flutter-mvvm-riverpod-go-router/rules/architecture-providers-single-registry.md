@@ -10,6 +10,12 @@ tags: riverpod, providers, dependency-injection
 Create and wire services, repositories, and viewmodels in lib/app/providers.dart.
 Do not instantiate concrete dependencies directly in UI code.
 
+Allowed exception:
+
+- Private screen-scoped providers (for example `_dueReviewCardsProvider`) may
+	be declared in a screen file when they only compose existing feature
+	viewmodels/providers and are not shared application-wide dependencies.
+
 **Incorrect:**
 
 ```dart

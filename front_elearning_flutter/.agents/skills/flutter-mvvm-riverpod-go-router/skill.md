@@ -8,7 +8,7 @@ description: |
 license: MIT
 metadata:
   author: project-team
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Flutter MVVM Skills
@@ -47,7 +47,6 @@ Apply this skill when you are:
 ### 2. Data Flow (CRITICAL)
 
 - data-repository-result-pattern
-- data-repository-map-response
 
 ### 3. State (HIGH)
 
@@ -61,7 +60,6 @@ Apply this skill when you are:
 
 ### 5. UI (HIGH)
 
-- ui-screen-widget-separation
 - ui-loading-error-empty-consistency
 
 ### 6. Reliability (MEDIUM)
@@ -87,3 +85,10 @@ Each rule file includes:
 ## Full Rule Set
 
 See the rules directory for all rules.
+
+## Repository Reality Notes
+
+- Core DI providers (Dio, services, repositories, feature viewmodels) live in
+  `lib/app/providers.dart`.
+- Screen-scoped read-only providers are allowed as private providers inside a
+  screen file when the state is local to that screen lifecycle.
