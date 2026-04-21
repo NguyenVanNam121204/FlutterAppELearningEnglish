@@ -82,6 +82,22 @@ class _GymScreenState extends ConsumerState<GymScreen> {
   Widget build(BuildContext context) {
     final asyncItems = ref.watch(_masteredNotebookCardsProvider);
     final asyncStats = ref.watch(_reviewStatisticsProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final leadingBadgeBg = isDark
+        ? const Color(0xFF243247)
+        : const Color(0xFFEAF5FF);
+    final leadingBadgeIcon = isDark
+        ? const Color(0xFFBFDBFE)
+        : const Color(0xFF0A84FF);
+    final partOfSpeechBg = isDark
+        ? const Color(0xFF334155)
+        : const Color(0xFFEAF5FF);
+    final partOfSpeechFg = isDark
+        ? const Color(0xFFE2E8F0)
+        : const Color(0xFF334155);
+    final pronunciationColor = isDark
+        ? const Color(0xFF7DD3FC)
+        : const Color(0xFF0A84FF);
 
     Future<void> onRefresh() async {
       await Future.wait([
@@ -220,9 +236,12 @@ class _GymScreenState extends ConsumerState<GymScreen> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const CircleAvatar(
-                            backgroundColor: Color(0xFFEAF5FF),
-                            child: Icon(Icons.translate_rounded),
+                          CircleAvatar(
+                            backgroundColor: leadingBadgeBg,
+                            child: Icon(
+                              Icons.translate_rounded,
+                              color: leadingBadgeIcon,
+                            ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -261,7 +280,7 @@ class _GymScreenState extends ConsumerState<GymScreen> {
                                         vertical: 4,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFEAF5FF),
+                                        color: partOfSpeechBg,
                                         borderRadius: BorderRadius.circular(
                                           999,
                                         ),
@@ -273,6 +292,7 @@ class _GymScreenState extends ConsumerState<GymScreen> {
                                             .labelSmall
                                             ?.copyWith(
                                               fontWeight: FontWeight.w700,
+                                              color: partOfSpeechFg,
                                             ),
                                       ),
                                     ),
@@ -284,7 +304,7 @@ class _GymScreenState extends ConsumerState<GymScreen> {
                                     '/${item.pronunciation}/',
                                     style: Theme.of(context).textTheme.bodySmall
                                         ?.copyWith(
-                                          color: const Color(0xFF0A84FF),
+                                          color: pronunciationColor,
                                           fontWeight: FontWeight.w600,
                                         ),
                                   ),

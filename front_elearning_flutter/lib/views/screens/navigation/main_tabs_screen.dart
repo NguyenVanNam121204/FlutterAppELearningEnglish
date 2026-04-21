@@ -55,12 +55,12 @@ class MainTabsScreen extends StatelessWidget {
           NavigationDestination(
             icon: Icon(Icons.menu_book_outlined),
             selectedIcon: Icon(Icons.menu_book_rounded),
-            label: 'Ôn tập từ vựng',
+            label: 'Ôn tập',
           ),
           NavigationDestination(
             icon: Icon(Icons.book_outlined),
             selectedIcon: Icon(Icons.book_rounded),
-            label: 'Sổ tay từ vựng',
+            label: 'Sổ tay',
           ),
           NavigationDestination(
             icon: Icon(Icons.person_outline),

@@ -9,12 +9,14 @@ class SuggestedCourseCard extends StatefulWidget {
     required this.course,
     required this.onOpenCourse,
     required this.onEnroll,
+    required this.imageHeight,
     this.isEnrolling = false,
   });
 
   final HomeCourseModel course;
   final VoidCallback onOpenCourse;
   final VoidCallback onEnroll;
+  final double imageHeight;
   final bool isEnrolling;
 
   @override
@@ -34,11 +36,13 @@ class _SuggestedCourseCardState extends State<SuggestedCourseCard> {
   @override
   Widget build(BuildContext context) {
     final course = widget.course;
+    final textScale = MediaQuery.textScalerOf(context).scale(1.0);
     final isEnrolled = course.isEnrolled;
     final title = course.title.trim().isEmpty ? 'Khóa học' : course.title;
+    final titleSlotHeight = 52.0 + ((textScale - 1).clamp(0.0, 0.6)) * 18;
     final hasLessonCount = course.totalLessons > 0;
     final lessonText = '${course.totalLessons} bài học';
-    final actionLabel = isEnrolled ? 'Vào học ngay' : 'Đăng ký ngay';
+    final actionLabel = isEnrolled ? 'Vào học' : 'Đăng ký';
     final actionIcon = isEnrolled
         ? Icons.arrow_forward_rounded
         : Icons.add_circle_outline_rounded;
@@ -63,7 +67,7 @@ class _SuggestedCourseCardState extends State<SuggestedCourseCard> {
                 Stack(
                   children: [
                     SizedBox(
-                      height: 134,
+                      height: widget.imageHeight,
                       child:
                           course.imageUrl == null ||
                               course.imageUrl!.trim().isEmpty
@@ -161,50 +165,75 @@ class _SuggestedCourseCardState extends State<SuggestedCourseCard> {
                       ),
                   ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 11, 12, 12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.w800),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        _formatPrice(course.price),
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      SizedBox(
-                        width: double.infinity,
-                        child: FilledButton.icon(
-                          onPressed: widget.isEnrolling
-                              ? null
-                              : (isEnrolled
-                                    ? widget.onOpenCourse
-                                    : widget.onEnroll),
-                          icon: widget.isEnrolling
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : Icon(actionIcon, size: 18),
-                          label: Text(
-                            widget.isEnrolling ? 'Đang xử lý...' : actionLabel,
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 11, 12, 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: titleSlotHeight,
+                          child: Align(
+                            alignment: Alignment.topLeft,
+                            child: Text(
+                              title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(fontWeight: FontWeight.w800),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 6),
+                        Text(
+                          _formatPrice(course.price),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.labelLarge
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.w800,
+                              ),
+                        ),
+                        const Spacer(),
+                        SizedBox(
+                          width: double.infinity,
+                          child: FilledButton.icon(
+                            style: FilledButton.styleFrom(
+                              minimumSize: const Size.fromHeight(44),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 10,
+                              ),
+                              textStyle: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            onPressed: widget.isEnrolling
+                                ? null
+                                : (isEnrolled
+                                      ? widget.onOpenCourse
+                                      : widget.onEnroll),
+                            icon: widget.isEnrolling
+                                ? const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Icon(actionIcon, size: 18),
+                            label: Text(
+                              widget.isEnrolling ? 'Đang xử lý' : actionLabel,
+                              maxLines: 1,
+                              softWrap: false,
+                              overflow: TextOverflow.fade,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],

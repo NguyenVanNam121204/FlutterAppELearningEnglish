@@ -27,8 +27,16 @@ class SuggestedCoursesSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final activeEnrollments = enrollingCourseIds ?? const <int>{};
     final width = MediaQuery.of(context).size.width;
+    final textScale = MediaQuery.textScalerOf(context).scale(1.0);
     final crossAxisCount = width >= 980 ? 3 : 2;
-    final childAspectRatio = width >= 980 ? 0.80 : 0.74;
+    final imageHeight = width >= 980
+        ? 148.0
+        : width >= 420
+        ? 132.0
+        : 120.0;
+    final textScaleBoost = ((textScale - 1).clamp(0.0, 0.6)) * 30;
+    final baseContentHeight = width >= 420 ? 176.0 : 190.0;
+    final mainAxisExtent = imageHeight + baseContentHeight + textScaleBoost;
     final showSkeleton = isLoading && courses.isEmpty;
     final skeletonCount = width >= 980 ? 6 : 4;
 
@@ -46,11 +54,11 @@ class SuggestedCoursesSection extends StatelessWidget {
               crossAxisCount: crossAxisCount,
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
-              childAspectRatio: childAspectRatio,
+              mainAxisExtent: mainAxisExtent,
             ),
             itemBuilder: (context, index) => CatalunyaReveal(
               delay: Duration(milliseconds: 50 * index),
-              child: const _SuggestedCourseCardSkeleton(),
+              child: _SuggestedCourseCardSkeleton(imageHeight: imageHeight),
             ),
           )
         else if (courses.isEmpty)
@@ -64,7 +72,7 @@ class SuggestedCoursesSection extends StatelessWidget {
               crossAxisCount: crossAxisCount,
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
-              childAspectRatio: childAspectRatio,
+              mainAxisExtent: mainAxisExtent,
             ),
             itemBuilder: (context, index) {
               final course = courses[index];
@@ -72,6 +80,7 @@ class SuggestedCoursesSection extends StatelessWidget {
                 delay: Duration(milliseconds: 65 * index),
                 child: SuggestedCourseCard(
                   course: course,
+                  imageHeight: imageHeight,
                   isEnrolling: activeEnrollments.contains(course.courseId),
                   onOpenCourse: () => onOpenCourse(course),
                   onEnroll: () => onEnrollCourse(course),
@@ -85,7 +94,9 @@ class SuggestedCoursesSection extends StatelessWidget {
 }
 
 class _SuggestedCourseCardSkeleton extends StatelessWidget {
-  const _SuggestedCourseCardSkeleton();
+  const _SuggestedCourseCardSkeleton({required this.imageHeight});
+
+  final double imageHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +108,7 @@ class _SuggestedCourseCardSkeleton extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
-              height: 134,
+              height: imageHeight,
               decoration: const BoxDecoration(
                 color: Color(0xFFE9EEF6),
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
