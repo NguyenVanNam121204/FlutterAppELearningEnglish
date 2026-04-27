@@ -1,3 +1,6 @@
+import 'package:flutter/foundation.dart';
+import '../../app/config/app_config.dart';
+
 class AssignmentQuizItemModel {
   const AssignmentQuizItemModel({
     required this.quizId,
@@ -8,6 +11,9 @@ class AssignmentQuizItemModel {
     this.totalQuestions,
     this.passingScore,
     this.maxAttempts,
+    this.isCompleted = false,
+    this.isPassed,
+    this.userScore,
   });
 
   final String quizId;
@@ -18,6 +24,9 @@ class AssignmentQuizItemModel {
   final int? totalQuestions;
   final int? passingScore;
   final int? maxAttempts;
+  final bool isCompleted;
+  final bool? isPassed;
+  final String? userScore;
 
   String get durationLabel {
     if ((durationMinutes ?? 0) <= 0) return '';
@@ -49,20 +58,35 @@ class AssignmentQuizItemModel {
       maxAttempts: maxAttemptsRaw is int
           ? maxAttemptsRaw
           : int.tryParse('${maxAttemptsRaw ?? ''}'),
+      isCompleted: (json['isCompleted'] ?? json['IsCompleted'] ?? false) == true,
+      isPassed: json['isPassed'] ?? json['IsPassed'],
+      userScore: (json['userScore'] ?? json['UserScore'] ?? json['score'] ?? json['Score'])?.toString(),
     );
   }
 }
 
 class AssignmentEssayItemModel {
-  const AssignmentEssayItemModel({required this.essayId, required this.title});
+  const AssignmentEssayItemModel({
+    required this.essayId,
+    required this.title,
+    this.isSubmitted = false,
+    this.isGraded = false,
+    this.score,
+  });
 
   final String essayId;
   final String title;
+  final bool isSubmitted;
+  final bool isGraded;
+  final String? score;
 
   factory AssignmentEssayItemModel.fromJson(Map<String, dynamic> json) {
     return AssignmentEssayItemModel(
       essayId: (json['essayId'] ?? json['EssayId'] ?? '').toString(),
       title: (json['title'] ?? json['Title'] ?? 'Essay').toString(),
+      isSubmitted: (json['isSubmitted'] ?? json['IsSubmitted'] ?? false) == true,
+      isGraded: (json['isGraded'] ?? json['IsGraded'] ?? false) == true,
+      score: (json['score'] ?? json['Score'])?.toString(),
     );
   }
 }
@@ -152,21 +176,98 @@ class AssignmentAssessmentItemModel {
 }
 
 class EssayDetailModel {
-  const EssayDetailModel({required this.title, required this.instruction});
+  const EssayDetailModel({
+    required this.title,
+    required this.instruction,
+    this.audioUrl,
+    this.imageUrl,
+  });
 
   final String title;
   final String instruction;
+  final String? audioUrl;
+  final String? imageUrl;
 
   factory EssayDetailModel.fromJson(Map<String, dynamic> json) {
     return EssayDetailModel(
       title: (json['title'] ?? json['Title'] ?? 'Essay').toString(),
-      instruction:
-          (json['description'] ??
-                  json['Description'] ??
-                  json['instruction'] ??
-                  json['Instruction'] ??
-                  '')
-              .toString(),
+      instruction: (json['description'] ??
+              json['Description'] ??
+              json['instruction'] ??
+              json['Instruction'] ??
+              '')
+          .toString(),
+      audioUrl: (json['audioUrl'] ?? json['AudioUrl'])?.toString(),
+      imageUrl: (json['imageUrl'] ?? json['ImageUrl'])?.toString(),
+    );
+  }
+}
+
+class EssaySubmissionModel {
+  const EssaySubmissionModel({
+    required this.submissionId,
+    required this.textContent,
+    this.attachmentUrl,
+    this.submittedAt,
+    this.score,
+    this.feedback,
+  });
+
+  final String submissionId;
+  final String textContent;
+  final String? attachmentUrl;
+  final String? submittedAt;
+  final String? score;
+  final String? feedback;
+
+  bool get isGraded => score != null;
+
+  String? get fullAttachmentUrl {
+    if (attachmentUrl == null || attachmentUrl!.isEmpty) return null;
+
+    String url = attachmentUrl!;
+    if (!url.startsWith('http')) {
+      final baseUrl = AppConfig.apiBaseUrl;
+      if (url.startsWith('/')) {
+        url = '$baseUrl$url';
+      } else {
+        url = '$baseUrl/$url';
+      }
+    }
+
+    // Normalize localhost for Android emulator
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+      url = url
+          .replaceFirst('://localhost', '://10.0.2.2')
+          .replaceFirst('://127.0.0.1', '://10.0.2.2');
+    }
+
+    return url;
+  }
+
+  factory EssaySubmissionModel.fromJson(Map<String, dynamic> json) {
+    return EssaySubmissionModel(
+      submissionId:
+          (json['submissionId'] ?? json['SubmissionId'] ?? '').toString(),
+      textContent:
+          (json['textContent'] ?? json['TextContent'] ?? '').toString(),
+      attachmentUrl:
+          (json['attachmentUrl'] ?? json['AttachmentUrl'])?.toString(),
+      submittedAt: (json['submittedAt'] ?? json['SubmittedAt'])?.toString(),
+      score: (json['score'] ??
+              json['Score'] ??
+              json['teacherScore'] ??
+              json['TeacherScore'] ??
+              json['aiScore'] ??
+              json['AiScore'])
+          ?.toString(),
+      feedback: (json['feedback'] ??
+              json['Feedback'] ??
+              json['teacherFeedback'] ??
+              json['TeacherFeedback'] ??
+              json['aiFeedback'] ??
+              json['AiFeedback'])
+          ?.toString(),
     );
   }
 }

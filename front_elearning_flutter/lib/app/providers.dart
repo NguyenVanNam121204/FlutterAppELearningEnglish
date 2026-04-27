@@ -1,4 +1,4 @@
-﻿import 'package:dio/dio.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/result/result.dart';
@@ -374,6 +374,17 @@ final essayDetailProvider = FutureProvider.autoDispose
       final result = await ref
           .read(assignmentFeatureViewModelProvider)
           .essayDetail(essayId);
+      return switch (result) {
+        Success(:final value) => value,
+        Failure(:final error) => throw Exception(error.message),
+      };
+    });
+
+final essaySubmissionStatusProvider = FutureProvider.autoDispose
+    .family<EssaySubmissionModel?, String>((ref, essayId) async {
+      final result = await ref
+          .read(assignmentFeatureViewModelProvider)
+          .getEssaySubmissionStatus(essayId);
       return switch (result) {
         Success(:final value) => value,
         Failure(:final error) => throw Exception(error.message),

@@ -1,4 +1,4 @@
-﻿import '../../core/result/result.dart';
+import '../../core/result/result.dart';
 import '../../models/learning/course_models.dart';
 import '../../models/learning/lecture_models.dart';
 import '../../models/learning/lesson_models.dart';

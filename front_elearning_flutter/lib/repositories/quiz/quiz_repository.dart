@@ -28,16 +28,9 @@ class QuizRepository {
       return const Failure(AppError(message: 'Quiz ID is required.'));
     }
 
-    final numericQuizId = int.tryParse(quizId!);
-    if (numericQuizId == null) {
-      return const Failure(
-        AppError(message: 'Invalid quiz ID. Unable to start quiz attempt.'),
-      );
-    }
-
     try {
       final response = await _apiService.post(
-        ApiConstants.quizStartAttemptByQuizId(numericQuizId.toString()),
+        ApiConstants.quizStartAttemptByQuizId(quizId!),
       );
       return Success(QuizAttemptStartModel.fromJson(_asMap(response.data)));
     } on DioException catch (error) {
@@ -101,8 +94,8 @@ class QuizRepository {
       await _apiService.post(
         ApiConstants.quizUpdateAnswer(attemptId),
         data: {
-          'questionId': int.tryParse(questionId) ?? questionId,
-          'userAnswer': userAnswer,
+          'QuestionId': int.tryParse(questionId) ?? questionId,
+          'UserAnswer': userAnswer,
         },
       );
       return const Success(null);

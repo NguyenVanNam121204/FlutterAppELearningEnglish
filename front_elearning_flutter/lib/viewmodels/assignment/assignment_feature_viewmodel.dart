@@ -1,4 +1,4 @@
-﻿import '../../core/result/result.dart';
+import '../../core/result/result.dart';
 import '../../models/assignment/assignment_models.dart';
 import '../../repositories/assignment/assignment_repository.dart';
 
@@ -26,5 +26,11 @@ class AssignmentFeatureViewModel {
     required String content,
   }) async {
     return _repository.submitEssay(essayId: essayId, content: content);
+  }
+
+  Future<Result<EssaySubmissionModel?>> getEssaySubmissionStatus(
+    String essayId,
+  ) async {
+    return _repository.getEssaySubmissionStatus(essayId);
   }
 }

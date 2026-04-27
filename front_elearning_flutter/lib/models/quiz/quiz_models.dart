@@ -312,7 +312,11 @@ class QuizActiveAttemptModel {
         ? remainRaw
         : int.tryParse('${remainRaw ?? ''}');
 
-    final attemptIdRaw = json['attemptId'] ?? json['AttemptId'];
+    final attemptIdRaw =
+        json['attemptId'] ??
+        json['AttemptId'] ??
+        json['quizAttemptId'] ??
+        json['QuizAttemptId'];
     final hasAttempt =
         (json['hasActiveAttempt'] ?? json['HasActiveAttempt']) == true;
 

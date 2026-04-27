@@ -80,6 +80,31 @@ class AssignmentRepository {
     }
   }
 
+  Future<Result<EssaySubmissionModel?>> getEssaySubmissionStatus(
+    String essayId,
+  ) async {
+    try {
+      final response = await _apiService.get(
+        ApiConstants.userEssaySubmissionStatus(essayId),
+      );
+      final data = _asMap(response.data);
+      if (data.isEmpty ||
+          (data['submissionId'] == null && data['SubmissionId'] == null)) {
+        return const Success(null);
+      }
+      return Success(EssaySubmissionModel.fromJson(data));
+    } on DioException catch (error) {
+      if (error.response?.statusCode == 404) {
+        return const Success(null);
+      }
+      return Failure(_mapDioException(error));
+    } catch (_) {
+      return const Failure(
+        AppError(message: 'Unable to load essay submission status.'),
+      );
+    }
+  }
+
   Future<Result<void>> submitEssay({
     required String essayId,
     required String content,

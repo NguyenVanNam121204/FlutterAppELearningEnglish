@@ -30,6 +30,8 @@ class ApiConstants {
   static const userEssays = '$userBase/essays';
   static const userEssaySubmissions = '$userBase/essay-submissions';
   static const userEssaySubmissionsSubmit = '$userEssaySubmissions/submit';
+  static String userEssaySubmissionStatus(String essayId) =>
+      '$userEssaySubmissions/submission-status/essay/$essayId';
   static const userAssessments = '$userBase/assessments';
 
   static String notificationMarkAsRead(String id) =>

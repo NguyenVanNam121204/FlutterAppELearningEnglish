@@ -33,9 +33,10 @@ class _AssignmentDetailScreenState
 
   Future<void> _showQuizIntro(AssignmentQuizItemModel quiz) async {
     String? activeAttemptId;
+    final normalizedQuizId = quiz.quizId.trim();
     final activeResult = await ref
         .read(quizRepositoryProvider)
-        .checkActiveAttempt(quiz.quizId);
+        .checkActiveAttempt(normalizedQuizId);
     if (activeResult is Success<QuizActiveAttemptModel>) {
       if (activeResult.value.hasActiveAttempt &&
           (activeResult.value.attemptId ?? '').isNotEmpty) {
@@ -170,11 +171,15 @@ class _AssignmentDetailScreenState
                           SizedBox(
                             width: double.infinity,
                             child: TextButton(
-                              onPressed: () {
+                              onPressed: () async {
                                 Navigator.of(modalContext).pop();
-                                context.push(
-                                  '${RoutePaths.quiz}?quizId=${quiz.quizId}&attemptId=$activeAttemptId',
+                                await context.push(
+                                  '${RoutePaths.quiz}?quizId=$normalizedQuizId&attemptId=$activeAttemptId',
                                 );
+                                if (mounted) {
+                                  ref.invalidate(assignmentDetailProvider(
+                                      '${widget.assessmentId}::${widget.moduleId}'));
+                                }
                               },
                               child: const Text('Tiếp tục bài đang làm'),
                             ),
@@ -192,15 +197,19 @@ class _AssignmentDetailScreenState
                                 borderRadius: BorderRadius.circular(10),
                               ),
                             ),
-                            onPressed: () {
+                            onPressed: () async {
                               Navigator.of(modalContext).pop();
                               final forceNew =
                                   (activeAttemptId ?? '').isNotEmpty
-                                  ? '&forceNew=1'
-                                  : '';
-                              context.push(
-                                '${RoutePaths.quiz}?quizId=${quiz.quizId}$forceNew',
+                                      ? '&forceNew=1'
+                                      : '';
+                              await context.push(
+                                '${RoutePaths.quiz}?quizId=$normalizedQuizId$forceNew',
                               );
+                              if (mounted) {
+                                ref.invalidate(assignmentDetailProvider(
+                                    '${widget.assessmentId}::${widget.moduleId}'));
+                              }
                             },
                             child: Text(
                               (activeAttemptId ?? '').isNotEmpty
@@ -244,7 +253,7 @@ class _AssignmentDetailScreenState
             _didAutoRouteToSingleAssessment = true;
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (!mounted) return;
-              context.go(
+              context.replace(
                 '${RoutePaths.assignmentDetail}?moduleId=${widget.moduleId}&assessmentId=${assessments.first.assessmentId}',
               );
             });
@@ -329,8 +338,15 @@ class _AssignmentDetailScreenState
                       delay: Duration(milliseconds: index * 45),
                       child: CatalunyaNavTile(
                         title: q.title,
-                        subtitle: 'Bắt đầu làm quiz',
-                        leading: const Icon(Icons.quiz_outlined),
+                        subtitle: q.isCompleted
+                            ? 'Hoàn thành: ${q.userScore ?? 'Đạt'}'
+                            : 'Bắt đầu làm quiz',
+                        leading: Icon(
+                          q.isCompleted
+                              ? Icons.check_circle_rounded
+                              : Icons.quiz_outlined,
+                          color: q.isCompleted ? const Color(0xFF10B981) : null,
+                        ),
                         onTap: () => _showQuizIntro(q),
                       ),
                     );
@@ -350,11 +366,26 @@ class _AssignmentDetailScreenState
                       delay: Duration(milliseconds: 80 + index * 45),
                       child: CatalunyaNavTile(
                         title: e.title,
-                        subtitle: 'Viết và nộp bài tự luận',
-                        leading: const Icon(Icons.edit_note_rounded),
-                        onTap: () => context.push(
-                          '${RoutePaths.essay}?essayId=${e.essayId}',
+                        subtitle: e.isSubmitted
+                            ? (e.isGraded
+                                ? 'Đã chấm: ${e.score} điểm'
+                                : 'Đã nộp bài')
+                            : 'Viết và nộp bài tự luận',
+                        leading: Icon(
+                          e.isSubmitted
+                              ? Icons.task_alt_rounded
+                              : Icons.edit_note_rounded,
+                          color: e.isSubmitted ? const Color(0xFF10B981) : null,
                         ),
+                        onTap: () async {
+                          await context.push(
+                            '${RoutePaths.essay}?essayId=${e.essayId}',
+                          );
+                          if (mounted) {
+                            ref.invalidate(assignmentDetailProvider(
+                                '${widget.assessmentId}::${widget.moduleId}'));
+                          }
+                        },
                       ),
                     );
                   }),

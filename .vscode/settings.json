@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "C:/Users/Admin/Desktop/FlutterAppELearningEnglish/front_elearning_flutter/linux"
+    "cmake.sourceDirectory": "C:/Users/Admin/Desktop/FlutterAppELearningEnglish/front_elearning_flutter/linux",
+    "git.ignoreLimitWarning": true
 }
