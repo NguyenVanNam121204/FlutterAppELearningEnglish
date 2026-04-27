@@ -2,6 +2,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:go_router/go_router.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../app/providers.dart';
 import '../../../app/router/route_paths.dart';
@@ -64,6 +65,10 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
           final title = course.title;
           final description = course.description;
           final imageUrl = course.imageUrl;
+          final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+          final targetWidthPx =
+              (MediaQuery.of(context).size.width * devicePixelRatio).round();
+          const targetHeightPx = 380;
           final courseId = course.courseId.isEmpty
               ? widget.courseId
               : course.courseId;
@@ -81,11 +86,30 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
                     if (imageUrl.isNotEmpty)
                       ClipRRect(
                         borderRadius: BorderRadius.circular(14),
-                        child: Image.network(
-                          imageUrl,
+                        child: CachedNetworkImage(
+                          imageUrl: imageUrl,
                           height: 190,
                           width: double.infinity,
                           fit: BoxFit.cover,
+                          memCacheWidth: targetWidthPx,
+                          memCacheHeight: targetHeightPx,
+                          placeholder: (context, url) => Container(
+                            color: const Color(0xFFE8F2FF),
+                            alignment: Alignment.center,
+                            child: const SizedBox(
+                              width: 26,
+                              height: 26,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            color: const Color(0xFFE8F2FF),
+                            alignment: Alignment.center,
+                            child: const Icon(
+                              Icons.menu_book_rounded,
+                              size: 42,
+                            ),
+                          ),
                         ),
                       ),
                     if (imageUrl.isNotEmpty) const SizedBox(height: 14),

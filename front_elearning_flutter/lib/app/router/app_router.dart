@@ -104,14 +104,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           return ResetPasswordScreen(email: email, otpCode: otpCode);
         },
       ),
-      GoRoute(
-        path: RoutePaths.home,
-        redirect: (_, _) => RoutePaths.mainAppHome,
-      ),
-      GoRoute(
-        path: RoutePaths.mainApp,
-        redirect: (_, _) => RoutePaths.mainAppHome,
-      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return MainTabsScreen(navigationShell: navigationShell);

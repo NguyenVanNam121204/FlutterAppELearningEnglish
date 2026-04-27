@@ -11,8 +11,6 @@ class RoutePaths {
   static const verifyEmailOtp = '/verify-email-otp';
   static const verifyResetOtp = '/verify-reset-otp';
   static const resetPassword = '/reset-password';
-  static const home = '/home';
-  static const mainApp = '/main-app';
   static const mainAppHome = '/main-app/home';
   static const mainAppCourses = '/main-app/courses';
   static const mainAppVocabulary = '/main-app/vocabulary';

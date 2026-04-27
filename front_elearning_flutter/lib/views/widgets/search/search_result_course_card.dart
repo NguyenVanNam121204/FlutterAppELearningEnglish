@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../models/learning/course_models.dart';
 import '../common/catalunya_card.dart';
@@ -65,6 +66,7 @@ class _LeadingImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasImage = (imageUrl ?? '').trim().isNotEmpty;
+    final targetSizePx = (52 * MediaQuery.of(context).devicePixelRatio).round();
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
@@ -73,10 +75,17 @@ class _LeadingImage extends StatelessWidget {
         height: 52,
         color: const Color(0xFFE8F2FF),
         child: hasImage
-            ? Image.network(
-                imageUrl!.trim(),
+            ? CachedNetworkImage(
+                imageUrl: imageUrl!.trim(),
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
+                memCacheWidth: targetSizePx,
+                memCacheHeight: targetSizePx,
+                placeholder: (context, url) => const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                errorWidget: (context, url, error) {
                   return const Icon(Icons.school_rounded);
                 },
               )

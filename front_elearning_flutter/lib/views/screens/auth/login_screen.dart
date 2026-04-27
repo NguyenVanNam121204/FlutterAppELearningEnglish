@@ -21,7 +21,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _rememberMe = true;
 
   @override
   void dispose() {
@@ -91,23 +90,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               },
             ),
             const SizedBox(height: 10),
-            Row(
-              children: [
-                Checkbox(
-                  value: _rememberMe,
-                  onChanged: (value) =>
-                      setState(() => _rememberMe = value ?? false),
-                ),
-                const Text(
-                  'Remember me',
-                  style: TextStyle(color: Color(0xFF5E6A80)),
-                ),
-                const Spacer(),
-                TextButton(
-                  onPressed: () => context.go(RoutePaths.forgotPassword),
-                  child: const Text('Quên mật khẩu?'),
-                ),
-              ],
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () => context.go(RoutePaths.forgotPassword),
+                child: const Text('Quên mật khẩu?'),
+              ),
             ),
             AuthPrimaryButton(
               label: 'Đăng nhập',

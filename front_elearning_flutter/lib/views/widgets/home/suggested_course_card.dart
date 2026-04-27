@@ -1,4 +1,5 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../models/home/home_course_model.dart';
 import '../common/catalunya_card.dart';
@@ -37,6 +38,8 @@ class _SuggestedCourseCardState extends State<SuggestedCourseCard> {
   Widget build(BuildContext context) {
     final course = widget.course;
     final textScale = MediaQuery.textScalerOf(context).scale(1.0);
+    final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+    final targetImageHeightPx = (widget.imageHeight * devicePixelRatio).round();
     final isEnrolled = course.isEnrolled;
     final title = course.title.trim().isEmpty ? 'Khóa học' : course.title;
     final titleSlotHeight = 52.0 + ((textScale - 1).clamp(0.0, 0.6)) * 18;
@@ -83,11 +86,25 @@ class _SuggestedCourseCardState extends State<SuggestedCourseCard> {
                               borderRadius: const BorderRadius.vertical(
                                 top: Radius.circular(20),
                               ),
-                              child: Image.network(
-                                course.imageUrl!,
+                              child: CachedNetworkImage(
+                                imageUrl: course.imageUrl!.trim(),
                                 width: double.infinity,
                                 fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
+                                memCacheHeight: targetImageHeightPx,
+                                placeholder: (context, url) {
+                                  return Container(
+                                    color: const Color(0xFFE8F2FF),
+                                    alignment: Alignment.center,
+                                    child: const SizedBox(
+                                      width: 22,
+                                      height: 22,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                errorWidget: (context, url, error) {
                                   return Container(
                                     color: const Color(0xFFE8F2FF),
                                     alignment: Alignment.center,
