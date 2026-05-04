@@ -160,12 +160,27 @@ class AuthRepository {
 
   AppError _mapDioException(DioException error) {
     final responseData = error.response?.data;
-    final message = responseData is Map<String, dynamic>
-        ? (responseData['message'] ??
-                  responseData['Message'] ??
-                  'không thấy thông báo lỗi cụ thể nào')
-              .toString()
-        : 'Không thể kết nối đến hệ thống';
+    String message = 'Không thể kết nối đến hệ thống';
+
+    if (responseData is Map<String, dynamic>) {
+      // Xử lý lỗi validation mặc định của ASP.NET Core (FluentValidation trả về "errors": { ... })
+      if (responseData.containsKey('errors')) {
+        final errors = responseData['errors'];
+        if (errors is Map<String, dynamic> && errors.isNotEmpty) {
+          // Lấy thông báo lỗi đầu tiên trong danh sách các lỗi
+          final firstErrorList = errors.values.first;
+          if (firstErrorList is List && firstErrorList.isNotEmpty) {
+            message = firstErrorList.first.toString();
+          }
+        }
+      } else {
+        // Xử lý custom response có field message hoặc Message
+        message = (responseData['message'] ??
+                responseData['Message'] ??
+                'Không thấy thông báo lỗi cụ thể nào')
+            .toString();
+      }
+    }
 
     return AppError(message: message, statusCode: error.response?.statusCode);
   }

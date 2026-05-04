@@ -1,7 +1,7 @@
 class ApiConstants {
-  static const authBase = '/api/auth';
-  static const userBase = '/api/user';
-  static const sharedBase = '/api/shared';
+  static const authBase = 'auth';
+  static const userBase = 'user';
+  static const sharedBase = 'shared';
 
   static const login = '$authBase/login';
   static const register = '$authBase/register';
