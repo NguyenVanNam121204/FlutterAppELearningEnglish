@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import '../../app/config/app_config.dart';
 
 class AssignmentQuizItemModel {
@@ -58,9 +57,15 @@ class AssignmentQuizItemModel {
       maxAttempts: maxAttemptsRaw is int
           ? maxAttemptsRaw
           : int.tryParse('${maxAttemptsRaw ?? ''}'),
-      isCompleted: (json['isCompleted'] ?? json['IsCompleted'] ?? false) == true,
+      isCompleted:
+          (json['isCompleted'] ?? json['IsCompleted'] ?? false) == true,
       isPassed: json['isPassed'] ?? json['IsPassed'],
-      userScore: (json['userScore'] ?? json['UserScore'] ?? json['score'] ?? json['Score'])?.toString(),
+      userScore:
+          (json['userScore'] ??
+                  json['UserScore'] ??
+                  json['score'] ??
+                  json['Score'])
+              ?.toString(),
     );
   }
 }
@@ -84,7 +89,8 @@ class AssignmentEssayItemModel {
     return AssignmentEssayItemModel(
       essayId: (json['essayId'] ?? json['EssayId'] ?? '').toString(),
       title: (json['title'] ?? json['Title'] ?? 'Essay').toString(),
-      isSubmitted: (json['isSubmitted'] ?? json['IsSubmitted'] ?? false) == true,
+      isSubmitted:
+          (json['isSubmitted'] ?? json['IsSubmitted'] ?? false) == true,
       isGraded: (json['isGraded'] ?? json['IsGraded'] ?? false) == true,
       score: (json['score'] ?? json['Score'])?.toString(),
     );
@@ -191,12 +197,13 @@ class EssayDetailModel {
   factory EssayDetailModel.fromJson(Map<String, dynamic> json) {
     return EssayDetailModel(
       title: (json['title'] ?? json['Title'] ?? 'Essay').toString(),
-      instruction: (json['description'] ??
-              json['Description'] ??
-              json['instruction'] ??
-              json['Instruction'] ??
-              '')
-          .toString(),
+      instruction:
+          (json['description'] ??
+                  json['Description'] ??
+                  json['instruction'] ??
+                  json['Instruction'] ??
+                  '')
+              .toString(),
       audioUrl: (json['audioUrl'] ?? json['AudioUrl'])?.toString(),
       imageUrl: (json['imageUrl'] ?? json['ImageUrl'])?.toString(),
     );
@@ -235,39 +242,34 @@ class EssaySubmissionModel {
       }
     }
 
-    // Normalize localhost for Android emulator
-    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
-      url = url
-          .replaceFirst('://localhost', '://10.0.2.2')
-          .replaceFirst('://127.0.0.1', '://10.0.2.2');
-    }
-
     return url;
   }
 
   factory EssaySubmissionModel.fromJson(Map<String, dynamic> json) {
     return EssaySubmissionModel(
-      submissionId:
-          (json['submissionId'] ?? json['SubmissionId'] ?? '').toString(),
-      textContent:
-          (json['textContent'] ?? json['TextContent'] ?? '').toString(),
-      attachmentUrl:
-          (json['attachmentUrl'] ?? json['AttachmentUrl'])?.toString(),
+      submissionId: (json['submissionId'] ?? json['SubmissionId'] ?? '')
+          .toString(),
+      textContent: (json['textContent'] ?? json['TextContent'] ?? '')
+          .toString(),
+      attachmentUrl: (json['attachmentUrl'] ?? json['AttachmentUrl'])
+          ?.toString(),
       submittedAt: (json['submittedAt'] ?? json['SubmittedAt'])?.toString(),
-      score: (json['score'] ??
-              json['Score'] ??
-              json['teacherScore'] ??
-              json['TeacherScore'] ??
-              json['aiScore'] ??
-              json['AiScore'])
-          ?.toString(),
-      feedback: (json['feedback'] ??
-              json['Feedback'] ??
-              json['teacherFeedback'] ??
-              json['TeacherFeedback'] ??
-              json['aiFeedback'] ??
-              json['AiFeedback'])
-          ?.toString(),
+      score:
+          (json['score'] ??
+                  json['Score'] ??
+                  json['teacherScore'] ??
+                  json['TeacherScore'] ??
+                  json['aiScore'] ??
+                  json['AiScore'])
+              ?.toString(),
+      feedback:
+          (json['feedback'] ??
+                  json['Feedback'] ??
+                  json['teacherFeedback'] ??
+                  json['TeacherFeedback'] ??
+                  json['aiFeedback'] ??
+                  json['AiFeedback'])
+              ?.toString(),
     );
   }
 }

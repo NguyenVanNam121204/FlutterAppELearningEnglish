@@ -8,11 +8,11 @@ import '../../views/screens/auth/register_screen.dart';
 import '../../views/screens/auth/reset_password_screen.dart';
 import '../../views/screens/auth/verify_email_otp_screen.dart';
 import '../../views/screens/auth/verify_reset_otp_screen.dart';
-import '../../views/screens/gym/gym_screen.dart';
+import '../../views/screens/notebook/notebook_screen.dart';
 import '../../views/screens/home/home_screen.dart';
 import '../../views/screens/loading/loading_page.dart';
 import '../../views/screens/navigation/main_tabs_screen.dart';
-import '../../views/screens/onion/onion_screen.dart';
+import '../../views/screens/my_course/my_course_screen.dart';
 import '../../views/screens/profile/profile_screen.dart';
 import '../../views/screens/pro/pro_screen.dart';
 import '../../views/screens/assignment/assignment_detail_screen.dart';
@@ -33,6 +33,8 @@ import '../../views/screens/payment/payment_history_screen.dart';
 import '../../views/screens/payment/payment_screen.dart';
 import '../../views/screens/payment/payment_success_screen.dart';
 import '../../views/screens/quiz/quiz_screen.dart';
+import '../../views/screens/quiz/quiz_result_detail_screen.dart';
+import '../../views/screens/quiz/quiz_history_screen.dart';
 import '../../views/screens/search/search_screen.dart';
 import '../../views/screens/vocabulary/vocabulary_screen.dart';
 import '../providers.dart';
@@ -121,7 +123,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: RoutePaths.mainAppCourses,
-                builder: (context, state) => const OnionScreen(),
+                builder: (context, state) => const MyCourseScreen(),
                 routes: [
                   GoRoute(
                     path: 'course/:courseId',
@@ -168,7 +170,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: RoutePaths.mainAppNotebook,
-                builder: (context, state) => const GymScreen(),
+                builder: (context, state) => const NotebookScreen(),
               ),
             ],
           ),
@@ -283,6 +285,19 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           quizId: state.uri.queryParameters['quizId'] ?? '',
           attemptId: state.uri.queryParameters['attemptId'],
           forceNewAttempt: state.uri.queryParameters['forceNew'] == '1',
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.quizResultDetail,
+        builder: (context, state) => QuizResultDetailScreen(
+          attemptId: state.uri.queryParameters['attemptId'] ?? '',
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.quizHistory,
+        builder: (context, state) => QuizHistoryScreen(
+          quizId: state.uri.queryParameters['quizId'] ?? '',
+          quizTitle: state.uri.queryParameters['quizTitle'] ?? 'Bài Quiz',
         ),
       ),
       GoRoute(

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,7 +7,6 @@ import 'package:just_audio/just_audio.dart';
 
 import '../../../app/providers.dart';
 import '../../../app/router/route_paths.dart';
-import '../../widgets/common/catalunya_nav_tile.dart';
 import '../../widgets/common/catalunya_scaffold.dart';
 import '../../widgets/common/empty_state_view.dart';
 import '../../widgets/common/state_views.dart';
@@ -23,37 +24,61 @@ class PronunciationScreen extends ConsumerStatefulWidget {
 class _PronunciationScreenState extends ConsumerState<PronunciationScreen> {
   late final AudioPlayer _audioPlayer;
   String _playingUrl = '';
+  StreamSubscription? _playerSub;
 
   @override
   void initState() {
     super.initState();
     _audioPlayer = AudioPlayer();
+    _playerSub = _audioPlayer.playerStateStream.listen((state) {
+      if (state.processingState == ProcessingState.completed) {
+        if (mounted) {
+          setState(() {
+            _playingUrl = '';
+          });
+        }
+      }
+    });
   }
 
   Future<void> _playAudio(String audioUrl) async {
     try {
+      // 1. Kiểm tra nếu chính URL này đang phát thì dừng lại
       if (_audioPlayer.playing && _playingUrl == audioUrl) {
         await _audioPlayer.stop();
-        if (!mounted) return;
-        setState(() => _playingUrl = '');
+        if (mounted) setState(() => _playingUrl = '');
         return;
       }
 
+      // 2. Dừng bất kỳ âm thanh nào đang phát
+      await _audioPlayer.stop();
+
+      // 3. Xóa URL cũ hoàn toàn khỏi Player để tránh kẹt cache/buffer
+      await _audioPlayer.seek(null);
+
+      // 4. Bắt đầu phát URL mới
       _playingUrl = audioUrl;
+      if (mounted) setState(() {}); // Hiện icon Stop ngay lập tức
+
       await _audioPlayer.setUrl(audioUrl);
       await _audioPlayer.play();
-      if (!mounted) return;
-      setState(() {});
-    } catch (_) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Không thể phát audio mẫu')));
+
+      // 5. Sau khi play() kết thúc (phát xong), cập nhật UI
+      if (mounted) setState(() => _playingUrl = '');
+    } catch (e) {
+      debugPrint('Audio error: $e');
+      if (mounted) {
+        setState(() => _playingUrl = '');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Không thể phát audio mẫu')),
+        );
+      }
     }
   }
 
   @override
   void dispose() {
+    _playerSub?.cancel();
     _audioPlayer.dispose();
     super.dispose();
   }
@@ -78,75 +103,206 @@ class _PronunciationScreenState extends ConsumerState<PronunciationScreen> {
             );
           }
 
-          return ListView(
-            padding: const EdgeInsets.all(12),
-            children: [
-              _PronunciationSummaryCard(
-                summaryAsync: asyncSummary,
-                onStart: () => context.push(
-                  '${RoutePaths.pronunciationDetail}?moduleId=${widget.moduleId}&startIndex=0',
-                ),
-              ),
-              const SizedBox(height: 12),
-              ...List.generate(list.length, (index) {
-                final p = list[index];
-                final audio = p.audioUrl;
-                final practiced = p.progress.hasPracticed;
-                final scoreText = practiced
-                    ? 'Điểm tốt nhất: ${p.progress.bestScore.toStringAsFixed(1)}'
-                    : 'Chưa luyện';
+          return ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            separatorBuilder: (context, _) => const SizedBox(height: 12),
+            itemCount: list.length + 1,
+            itemBuilder: (context, i) {
+              if (i == 0) {
+                return _PronunciationSummaryCard(
+                  summaryAsync: asyncSummary,
+                  onStart: () => context.push(
+                    '${RoutePaths.pronunciationDetail}?moduleId=${widget.moduleId}&startIndex=0',
+                  ),
+                );
+              }
 
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: CatalunyaNavTile(
-                    title: p.word,
-                    subtitle: p.phonetic.isEmpty
-                        ? scoreText
-                        : '/${p.phonetic}/ • $scoreText',
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
+              final index = i - 1;
+              final p = list[index];
+              final audio = p.audioUrl;
+              final practiced = p.progress.hasPracticed;
+              final scoreText = practiced
+                  ? 'Điểm tốt nhất: ${p.progress.bestScore.toStringAsFixed(1)}'
+                  : 'Chưa luyện';
+
+              return Material(
+                color: Theme.of(context).cardColor,
+                elevation: 6,
+                borderRadius: BorderRadius.circular(16),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: () => context.push(
+                    '${RoutePaths.pronunciationDetail}?moduleId=${widget.moduleId}&startIndex=$index',
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 12,
+                    ),
+                    child: Row(
                       children: [
-                        if (audio.isNotEmpty)
-                          IconButton(
-                            tooltip: 'Nghe phát âm',
-                            icon: Icon(
-                              _playingUrl == audio && _audioPlayer.playing
-                                  ? Icons.stop_circle_outlined
-                                  : Icons.volume_up_outlined,
-                            ),
-                            onPressed: () => _playAudio(audio),
-                          ),
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
+                          width: 56,
+                          height: 56,
                           decoration: BoxDecoration(
-                            color: _statusColor(
-                              p.progress.status,
-                            ).withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(999),
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF0EA5E9), Color(0xFF22D3EE)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(14),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(
+                                  0xFF0EA5E9,
+                                ).withValues(alpha: 0.12),
+                                blurRadius: 12,
+                                offset: const Offset(0, 6),
+                              ),
+                            ],
                           ),
-                          child: Text(
-                            p.progress.status,
-                            style: TextStyle(
-                              color: _statusColor(p.progress.status),
-                              fontWeight: FontWeight.w600,
-                              fontSize: 11,
+                          child: Center(
+                            child: Text(
+                              p.word.isNotEmpty ? p.word[0].toUpperCase() : '?',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 20,
+                              ),
                             ),
                           ),
                         ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                p.word,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                p.phonetic.isEmpty
+                                    ? scoreText
+                                    : '/${p.phonetic}/ • $scoreText',
+                                style: TextStyle(
+                                  color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (audio.isNotEmpty)
+                              Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () => _playAudio(audio),
+                                  borderRadius: BorderRadius.circular(999),
+                                  child: Container(
+                                    width: 48,
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.white,
+                                      border: Border.all(
+                                        color: const Color(
+                                          0xFF0EA5E9,
+                                        ).withValues(alpha: 0.2),
+                                        width: 1.5,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(
+                                            0xFF0EA5E9,
+                                          ).withValues(alpha: 0.1),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Center(
+                                      child: StreamBuilder<PlayerState>(
+                                        stream: _audioPlayer.playerStateStream,
+                                        builder: (context, snapshot) {
+                                          final playerState = snapshot.data;
+                                          final isPlaying =
+                                              playerState?.playing ?? false;
+                                          final isProcessing =
+                                              (playerState?.processingState ==
+                                                  ProcessingState.loading ||
+                                              playerState?.processingState ==
+                                                  ProcessingState.buffering);
+
+                                          if (_playingUrl == audio &&
+                                              isProcessing) {
+                                            return const SizedBox(
+                                              width: 20,
+                                              height: 20,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                valueColor:
+                                                    AlwaysStoppedAnimation<
+                                                      Color
+                                                    >(Color(0xFF0EA5E9)),
+                                              ),
+                                            );
+                                          }
+
+                                          return Icon(
+                                            _playingUrl == audio && isPlaying
+                                                ? Icons.stop_rounded
+                                                : Icons.volume_up_rounded,
+                                            color: const Color(0xFF0EA5E9),
+                                            size: 26,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: _statusColor(
+                                  p.progress.status,
+                                ).withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              child: Text(
+                                p.progress.status,
+                                style: TextStyle(
+                                  color: _statusColor(p.progress.status),
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                         const SizedBox(width: 6),
-                        const Icon(Icons.chevron_right_rounded),
+                        const Icon(
+                          Icons.chevron_right_rounded,
+                          color: Colors.grey,
+                        ),
                       ],
                     ),
-                    onTap: () => context.push(
-                      '${RoutePaths.pronunciationDetail}?moduleId=${widget.moduleId}&startIndex=$index',
-                    ),
                   ),
-                );
-              }),
-            ],
+                ),
+              );
+            },
           );
         },
         loading: () => const LoadingStateView(),
@@ -177,113 +333,147 @@ class _PronunciationSummaryCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Color(0x332563EB),
-            blurRadius: 12,
-            offset: Offset(0, 6),
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Lộ trình phát âm',
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Lộ trình phát âm',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    summaryAsync.when(
+                      data: (summary) => Text(
+                        '${summary.totalPracticed}/${summary.totalFlashcards} từ đã luyện • Điểm TB ${summary.averageScore.toStringAsFixed(1)}',
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      loading: () => const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8),
+                        child: LinearProgressIndicator(minHeight: 6),
+                      ),
+                      error: (_, _) => const Text(
+                        'Không tải được thống kê',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF0EA5E9), Color(0xFF22D3EE)],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.graphic_eq_rounded,
+                  color: Colors.white,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           summaryAsync.when(
-            data: (summary) => Wrap(
-              spacing: 8,
-              runSpacing: 8,
+            data: (summary) => Column(
               children: [
-                _SummaryChip(
-                  label: 'Đã luyện',
-                  value: '${summary.totalPracticed}/${summary.totalFlashcards}',
+                Row(
+                  children: [
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: LinearProgressIndicator(
+                          value:
+                              summary.totalPracticed /
+                              (summary.totalFlashcards <= 0
+                                  ? 1
+                                  : summary.totalFlashcards),
+                          minHeight: 10,
+                          backgroundColor: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+                          valueColor: const AlwaysStoppedAnimation(
+                            Color(0xFF22D3EE),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        '${summary.totalPracticed}/${summary.totalFlashcards}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                _SummaryChip(
-                  label: 'Đã thuộc',
-                  value: '${summary.masteredCount}',
-                ),
-                _SummaryChip(
-                  label: 'Điểm TB',
-                  value: summary.averageScore.toStringAsFixed(1),
-                ),
-                _SummaryChip(
-                  label: 'Xếp loại',
-                  value: summary.grade.isEmpty ? '-' : summary.grade,
+                const SizedBox(height: 14),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 8,
+                      backgroundColor: const Color(0xFF0EA5E9),
+                    ),
+                    onPressed: onStart,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.play_arrow_rounded, color: Colors.white),
+                        SizedBox(width: 8),
+                        Text(
+                          'Bắt đầu luyện ngay',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
-            loading: () => const Padding(
-              padding: EdgeInsets.symmetric(vertical: 8),
-              child: LinearProgressIndicator(minHeight: 4),
-            ),
-            error: (_, _) => const Text(
-              'Không tải được thống kê module',
-              style: TextStyle(color: Colors.white70),
-            ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                elevation: 6,
-                shadowColor: const Color(0x551E3A8A),
-                backgroundColor: Colors.white,
-                foregroundColor: const Color(0xFF1D4ED8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-              onPressed: onStart,
-              icon: const Icon(Icons.graphic_eq_rounded),
-              label: const Text(
-                'Bắt đầu luyện ngay',
-                style: TextStyle(fontWeight: FontWeight.w700),
-              ),
-            ),
+            loading: () => const SizedBox.shrink(),
+            error: (error, stack) => const SizedBox.shrink(),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _SummaryChip extends StatelessWidget {
-  const _SummaryChip({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        '$label: $value',
-        style: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w600,
-        ),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../app/providers.dart';
 import '../../../app/router/route_paths.dart';
@@ -12,6 +13,7 @@ import '../../widgets/common/catalunya_nav_tile.dart';
 import '../../widgets/common/catalunya_reveal.dart';
 import '../../widgets/common/catalunya_scaffold.dart';
 import '../../widgets/common/state_views.dart';
+import '../../widgets/quiz/quiz_active_attempt_warning.dart';
 
 class AssignmentDetailScreen extends ConsumerStatefulWidget {
   const AssignmentDetailScreen({
@@ -54,9 +56,9 @@ class _AssignmentDetailScreenState
         return FractionallySizedBox(
           heightFactor: 0.92,
           child: DecoratedBox(
-            decoration: const BoxDecoration(
-              color: Color(0xFFF3F4F6),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
             ),
             child: Column(
               children: [
@@ -170,7 +172,14 @@ class _AssignmentDetailScreenState
                         if ((activeAttemptId ?? '').isNotEmpty)
                           SizedBox(
                             width: double.infinity,
-                            child: TextButton(
+                            child: OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: Color(0xFF40C4D8), width: 1.5),
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
                               onPressed: () async {
                                 Navigator.of(modalContext).pop();
                                 await context.push(
@@ -181,7 +190,13 @@ class _AssignmentDetailScreenState
                                       '${widget.assessmentId}::${widget.moduleId}'));
                                 }
                               },
-                              child: const Text('Tiếp tục bài đang làm'),
+                              child: const Text(
+                                'Tiếp tục bài đang làm',
+                                style: TextStyle(
+                                  color: Color(0xFF40C4D8),
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                             ),
                           ),
                         if ((activeAttemptId ?? '').isNotEmpty)
@@ -198,13 +213,27 @@ class _AssignmentDetailScreenState
                               ),
                             ),
                             onPressed: () async {
+                              if ((activeAttemptId ?? '').isNotEmpty) {
+                                // Show warning instead of pushing new attempt
+                                showModalBottomSheet(
+                                  context: context,
+                                  backgroundColor: Colors.transparent,
+                                  builder: (c) => QuizActiveAttemptWarning(
+                                    onContinueOld: () {
+                                      Navigator.pop(c); // Close warning
+                                      Navigator.of(modalContext).pop(); // Close intro
+                                      context.push(
+                                        '${RoutePaths.quiz}?quizId=$normalizedQuizId&attemptId=$activeAttemptId',
+                                      );
+                                    },
+                                  ),
+                                );
+                                return;
+                              }
+
                               Navigator.of(modalContext).pop();
-                              final forceNew =
-                                  (activeAttemptId ?? '').isNotEmpty
-                                      ? '&forceNew=1'
-                                      : '';
                               await context.push(
-                                '${RoutePaths.quiz}?quizId=$normalizedQuizId$forceNew',
+                                '${RoutePaths.quiz}?quizId=$normalizedQuizId',
                               );
                               if (mounted) {
                                 ref.invalidate(assignmentDetailProvider(
@@ -218,10 +247,27 @@ class _AssignmentDetailScreenState
                             ),
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        TextButton(
-                          onPressed: () => Navigator.of(modalContext).pop(),
-                          child: const Text('Hủy'),
+                        const SizedBox(height: 10),
+                        SizedBox(
+                          width: double.infinity,
+                          child: FilledButton.tonal(
+                            style: FilledButton.styleFrom(
+                              backgroundColor: Colors.grey[100],
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            onPressed: () => Navigator.of(modalContext).pop(),
+                            child: Text(
+                              'Hủy bỏ',
+                              style: GoogleFonts.outfit(
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.w700,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -347,6 +393,33 @@ class _AssignmentDetailScreenState
                               : Icons.quiz_outlined,
                           color: q.isCompleted ? const Color(0xFF10B981) : null,
                         ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.only(right: 8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF40C4D8).withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: IconButton(
+                                constraints: const BoxConstraints(),
+                                padding: const EdgeInsets.all(8),
+                                icon: const Icon(
+                                  Icons.history_rounded,
+                                  color: Color(0xFF40C4D8),
+                                  size: 20,
+                                ),
+                                onPressed: () {
+                                  context.push(
+                                    '${RoutePaths.quizHistory}?quizId=${q.quizId}&quizTitle=${Uri.encodeComponent(q.title)}',
+                                  );
+                                },
+                              ),
+                            ),
+                            const Icon(Icons.chevron_right_rounded, size: 20, color: Colors.grey),
+                          ],
+                        ),
                         onTap: () => _showQuizIntro(q),
                       ),
                     );
@@ -412,8 +485,8 @@ class _QuizIntroTextBlock extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F5F9),
-        border: Border.all(color: const Color(0xFFCBD5E1)),
+        color: Theme.of(context).cardColor,
+        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -427,7 +500,7 @@ class _QuizIntroTextBlock extends StatelessWidget {
                 label,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFF334155),
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
             ],
@@ -451,8 +524,8 @@ class _QuizStatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        color: Theme.of(context).cardColor.withValues(alpha: 0.5),
+        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -461,7 +534,7 @@ class _QuizStatCard extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: const Color(0xFF64748B),
+              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
               fontWeight: FontWeight.w600,
             ),
           ),

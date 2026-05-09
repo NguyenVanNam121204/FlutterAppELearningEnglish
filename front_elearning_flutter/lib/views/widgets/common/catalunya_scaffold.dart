@@ -6,28 +6,35 @@ class CatalunyaScaffold extends StatelessWidget {
     this.appBar,
     required this.body,
     this.floatingActionButton,
+    this.backgroundColor,
   });
 
   final PreferredSizeWidget? appBar;
   final Widget body;
   final Widget? floatingActionButton;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: appBar,
       floatingActionButton: floatingActionButton,
       body: Container(
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF0F172A) : null,
-          gradient: isDark
+          color: backgroundColor ?? (isDark ? const Color(0xFF0F172A) : null),
+          gradient: (backgroundColor != null || isDark)
               ? null
               : const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [Color(0xFFF3FBFF), Color(0xFFF5F9FF), Color(0xFFF8FCFF)],
+                  colors: [
+                    Color(0xFFF3FBFF),
+                    Color(0xFFF5F9FF),
+                    Color(0xFFF8FCFF)
+                  ],
                 ),
         ),
         child: SafeArea(child: body),

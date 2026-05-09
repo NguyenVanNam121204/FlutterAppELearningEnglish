@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../app/router/route_paths.dart';
 
 import '../../../app/providers.dart';
 import '../../../models/learning/lesson_models.dart';
@@ -18,7 +20,7 @@ class LessonResultScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (initialResult != null) {
-      return _LessonResultBody(result: initialResult!);
+      return _LessonResultBody(result: initialResult!, attemptId: attemptId);
     }
 
     final asyncData = ref.watch(lessonResultProvider(attemptId));
@@ -33,7 +35,7 @@ class LessonResultScreen extends ConsumerWidget {
           automaticallyImplyLeading: false,
         ),
         body: asyncData.when(
-          data: (data) => _LessonResultCard(data: data),
+          data: (data) => _LessonResultCard(data: data, attemptId: attemptId),
           loading: () => const LoadingStateView(),
           error: (error, _) => ErrorStateView(message: '$error'),
         ),
@@ -43,9 +45,10 @@ class LessonResultScreen extends ConsumerWidget {
 }
 
 class _LessonResultBody extends StatelessWidget {
-  const _LessonResultBody({required this.result});
+  const _LessonResultBody({required this.result, required this.attemptId});
 
   final LessonResultModel result;
+  final String attemptId;
 
   @override
   Widget build(BuildContext context) {
@@ -62,16 +65,17 @@ class _LessonResultBody extends StatelessWidget {
           elevation: 0,
           automaticallyImplyLeading: false, // Xóa nút mũi tên quay lại
         ),
-        body: _LessonResultCard(data: result),
+        body: _LessonResultCard(data: result, attemptId: attemptId),
       ),
     );
   }
 }
 
 class _LessonResultCard extends StatelessWidget {
-  const _LessonResultCard({required this.data});
+  const _LessonResultCard({required this.data, required this.attemptId});
 
   final LessonResultModel data;
+  final String attemptId;
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +98,7 @@ class _LessonResultCard extends StatelessWidget {
       ),
       child: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
           child: Column(
             children: [
               // Icon & Status Header
@@ -106,11 +110,11 @@ class _LessonResultCard extends StatelessWidget {
                 ),
                 child: Icon(
                   isPassed ? Icons.emoji_events_rounded : Icons.sentiment_very_dissatisfied_rounded,
-                  size: 80,
+                  size: 60,
                   color: themeColor,
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               Text(
                 isPassed ? 'Chúc mừng!' : 'Cố gắng lên!',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -126,12 +130,12 @@ class _LessonResultCard extends StatelessWidget {
                   color: Colors.grey[600],
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
 
               // Score Card
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(32),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(30),
@@ -157,7 +161,7 @@ class _LessonResultCard extends StatelessWidget {
                     const SizedBox(height: 12),
                     Text(
                       data.score,
-                      style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                      style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                         fontWeight: FontWeight.w900,
                         color: Colors.black87,
                       ),
@@ -190,30 +194,61 @@ class _LessonResultCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 60),
+              const SizedBox(height: 24),
 
-              // Action Button
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: FilledButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Colors.black87,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+              // Action Buttons
+              Column(
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        context.push(
+                          '${RoutePaths.quizResultDetail}?attemptId=$attemptId',
+                        );
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.black12, width: 2),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: const Text(
+                        'XEM CHI TIẾT BÀI LÀM',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.black87,
+                          letterSpacing: 1.1,
+                        ),
+                      ),
                     ),
-                    elevation: 0,
                   ),
-                  child: const Text(
-                    'HOÀN THÀNH',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.2,
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: FilledButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Colors.black87,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        'HOÀN THÀNH',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
             ],
           ),

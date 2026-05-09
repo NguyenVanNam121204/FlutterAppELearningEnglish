@@ -5,9 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../app/providers.dart';
 import '../../../app/router/route_paths.dart';
 import '../../../viewmodels/quiz/quiz_screen_viewmodel.dart';
-import '../../widgets/common/catalunya_scaffold.dart';
-import '../../widgets/common/state_views.dart';
-import '../../widgets/quiz/quiz_question_card.dart';
+import '../../widgets/quiz/game/game_quiz_constants.dart';
+import '../../widgets/quiz/game/game_quiz_question_card.dart';
 
 class QuizScreen extends ConsumerStatefulWidget {
   const QuizScreen({
@@ -41,12 +40,8 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
   }
 
   String _formatRemaining(int seconds) {
-    final hours = seconds ~/ 3600;
-    final minutes = (seconds % 3600) ~/ 60;
+    final minutes = seconds ~/ 60;
     final secs = seconds % 60;
-    if (hours > 0) {
-      return '$hours:${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
-    }
     return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
   }
 
@@ -63,18 +58,21 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: const Text('Chưa hoàn thành'),
+            backgroundColor: GameQuizColors.surface,
+            title: const Text('Chưa hoàn thành', style: TextStyle(color: Colors.white)),
             content: Text(
               'Bạn mới trả lời $answeredCount/$totalQuestions câu. Bạn có chắc muốn nộp bài?',
+              style: const TextStyle(color: GameQuizColors.textSecondary),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Tiếp tục làm'),
+                child: const Text('Tiếp tục'),
               ),
               FilledButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('Nộp bài'),
+                style: FilledButton.styleFrom(backgroundColor: GameQuizColors.correct),
+                child: const Text('Nộp bài', style: TextStyle(color: Colors.black)),
               ),
             ],
           );
@@ -97,13 +95,6 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
     }
   }
 
-  Future<void> _continueAttempt(QuizScreenViewModel notifier) async {
-    await notifier.startAttempt(
-      resumeAttemptId: widget.attemptId,
-      forceStartNew: false,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(quizScreenViewModelProvider(widget.quizId));
@@ -111,384 +102,240 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
       quizScreenViewModelProvider(widget.quizId).notifier,
     );
 
-    ref.listen(quizScreenViewModelProvider(widget.quizId), (prev, next) {
-      if ((prev?.errorMessage != next.errorMessage) &&
-          (next.errorMessage?.isNotEmpty ?? false) &&
-          next.questions.isNotEmpty) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(next.errorMessage!)));
-        notifier.clearError();
-      }
-      if ((prev?.submittedAttemptId != next.submittedAttemptId) &&
-          (next.submittedAttemptId?.isNotEmpty ?? false)) {
-        context.pushReplacement(
-          '${RoutePaths.lessonResult}?attemptId=${next.submittedAttemptId}',
-          extra: next.submittedResult,
-        );
-        notifier.clearSubmittedAttempt();
-      }
-    });
-
-    return CatalunyaScaffold(
-      appBar: (state.questions.isEmpty || state.isLoading)
-          ? AppBar(
-              title: Text(state.quiz.title.isNotEmpty
-                  ? state.quiz.title
-                  : 'Chi tiết bài tập'),
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: _goBack,
-              ),
-            )
-          : null,
-      body: Builder(
-        builder: (context) {
-          if (state.isLoading) {
-            return const LoadingStateView();
-          }
-          if (state.questions.isEmpty) {
-            final isCannotContinue = (state.errorMessage ?? '')
-                .contains('Bài quiz này đã được nộp hoặc không thể tiếp tục');
-            final message = (state.errorMessage ?? '').trim().isNotEmpty
-                ? state.errorMessage!
-                : 'Không tải được đề thi, vui lòng thử lại.';
-
-            return _QuizInfoView(
-              title: state.quiz.title.isNotEmpty
-                  ? state.quiz.title
-                  : 'Thông báo',
-              message: state.isStarting ? 'Đang tải đề thi...' : message,
-              icon: isCannotContinue
-                  ? Icons.lock_clock_outlined
-                  : Icons.quiz_outlined,
-              onBack: _goBack,
-              onRetry: (state.isStarting || isCannotContinue)
-                  ? null
-                  : () => _continueAttempt(notifier),
-              retryLabel: state.isStarting ? 'Đang xử lý...' : 'Thử lại',
-            );
-          }
-
-          final clampedIndex = state.currentIndex.clamp(
-            0,
-            state.questions.length - 1,
+    ref.listen<QuizScreenState>(
+      quizScreenViewModelProvider(widget.quizId),
+      (prev, next) {
+        if (prev != null &&
+            prev.errorMessage != next.errorMessage &&
+            (next.errorMessage?.isNotEmpty ?? false) &&
+            next.questions.isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: GameQuizColors.incorrect,
+              content: Text(next.errorMessage!, style: const TextStyle(color: Colors.white)),
+            ),
           );
-          final question = state.questions[clampedIndex];
-          final questionId = question.questionId;
-          final answer = state.answers[questionId];
-
-          final warning = (state.remainingSeconds ?? 999999) < 300;
-          final danger = (state.remainingSeconds ?? 999999) < 60;
-          final answeredIds = state.answers.keys.toSet();
-
-          return Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    IconButton(
-                      onPressed: () => context.pop(),
-                      icon: const Icon(Icons.close, color: Colors.white),
-                    ),
-                    Expanded(
-                      child: Text(
-                        state.quiz.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                            ),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: state.hasAttempt && !state.isSubmitting
-                          ? () => _onSubmitPressed(state, notifier)
-                          : null,
-                      child: const Text('Nộp bài'),
-                    ),
-                  ],
-                ),
-              ),
-              if (state.remainingSeconds != null)
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  color: danger
-                      ? const Color(0xFFFEE2E2)
-                      : warning
-                      ? const Color(0xFFFEF3C7)
-                      : const Color(0xFFEFF6FF),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.schedule,
-                        color: danger
-                            ? const Color(0xFFEF4444)
-                            : warning
-                            ? const Color(0xFFF59E0B)
-                            : Theme.of(context).colorScheme.primary,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        _formatRemaining(state.remainingSeconds!),
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: danger
-                              ? const Color(0xFFEF4444)
-                              : warning
-                              ? const Color(0xFFF59E0B)
-                              : Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              Container(
-                color: Theme.of(context).cardColor,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 14,
-                ),
-                child: Row(
-                  children: [
-                    for (var i = 0; i < state.questions.length; i++)
-                      Expanded(
-                        child: Container(
-                          margin: EdgeInsets.only(
-                            right: i == state.questions.length - 1 ? 0 : 6,
-                          ),
-                          height: 4,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(999),
-                            color: i == clampedIndex
-                                ? const Color(0xFFEF4444)
-                                : answeredIds.contains(
-                                    state.questions[i].questionId,
-                                  )
-                                ? const Color(0xFF10B981)
-                                : const Color(0xFFE5E7EB),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                  child: QuizQuestionCard(
-                    question: question,
-                    answer: answer,
-                    hasAttempt: state.hasAttempt,
-                    questionNumber: clampedIndex + 1,
-                    totalQuestions: state.questions.length,
-                    onTextChanged: (v) => notifier.setTextAnswer(questionId, v),
-                    onToggleMulti: (optionId, checked) => notifier
-                        .toggleMultiAnswer(questionId, optionId, checked),
-                    onSelectSingle: (optionId) =>
-                        notifier.setSingleAnswer(questionId, optionId),
-                    onSetMatching: (pairs) =>
-                        notifier.setMatchingAnswer(questionId, pairs),
-                    onSetOrdering: (orderedIds) =>
-                        notifier.setOrderingAnswer(questionId, orderedIds),
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.fromLTRB(16, 10, 16, 18),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  border: Border(
-                    top: BorderSide(
-                      color: Theme.of(
-                        context,
-                      ).dividerColor.withValues(alpha: 0.5),
-                    ),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    OutlinedButton.icon(
-                      onPressed: clampedIndex > 0
-                          ? notifier.previousQuestion
-                          : null,
-                      icon: const Icon(Icons.chevron_left),
-                      label: const Text('Trước'),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: clampedIndex == state.questions.length - 1
-                          ? FilledButton.icon(
-                              onPressed: state.isSubmitting
-                                  ? null
-                                  : () => _onSubmitPressed(state, notifier),
-                              style: FilledButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 14,
-                                ),
-                                backgroundColor: const Color(0xFF059669),
-                              ),
-                              icon: state.isSubmitting
-                                  ? const SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : const Icon(Icons.check_circle),
-                              label: Text(
-                                state.isSubmitting ? 'Đang nộp...' : 'Nộp bài',
-                              ),
-                            )
-                          : FilledButton.icon(
-                              onPressed: notifier.nextQuestion,
-                              style: FilledButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 14,
-                                ),
-                                backgroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.primary,
-                              ),
-                              iconAlignment: IconAlignment.end,
-                              icon: const Icon(Icons.chevron_right),
-                              label: const Text('Tiếp theo'),
-                            ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+          notifier.clearError();
+        }
+        if (prev != null &&
+            prev.submittedAttemptId != next.submittedAttemptId &&
+            (next.submittedAttemptId?.isNotEmpty ?? false)) {
+          context.pushReplacement(
+            '${RoutePaths.lessonResult}?attemptId=${next.submittedAttemptId}',
+            extra: next.submittedResult,
           );
-        },
+          notifier.clearSubmittedAttempt();
+        }
+      },
+    );
+
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: GameQuizColors.bgGradient,
+          ),
+        ),
+        child: SafeArea(
+          child: Builder(
+            builder: (context) {
+              if (state.isLoading) {
+                return const Center(child: CircularProgressIndicator(color: GameQuizColors.primary));
+              }
+              
+              if (state.questions.isEmpty) {
+                return _buildEmptyState(state, notifier);
+              }
+
+              final clampedIndex = state.currentIndex.clamp(0, state.questions.length - 1);
+              final question = state.questions[clampedIndex];
+              final questionId = question.questionId;
+              final answer = state.answers[questionId];
+
+              return Column(
+                children: [
+                  // Game Header
+                  _buildGameHeader(state, notifier, clampedIndex),
+                  
+                  // Question Card
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(20),
+                      child: GameQuizQuestionCard(
+                        question: question,
+                        answer: answer,
+                        onTextChanged: (v) => notifier.setTextAnswer(questionId, v),
+                        onToggleMulti: (optionId, checked) => notifier.toggleMultiAnswer(questionId, optionId, checked),
+                        onSelectSingle: (optionId) => notifier.setSingleAnswer(questionId, optionId),
+                        onSetMatching: (pairs) => notifier.setMatchingAnswer(questionId, pairs),
+                        onSetOrdering: (orderedIds) => notifier.setOrderingAnswer(questionId, orderedIds),
+                      ),
+                    ),
+                  ),
+                  
+                  // Bottom Controls
+                  _buildBottomControls(state, notifier, clampedIndex),
+                ],
+              );
+            },
+          ),
+        ),
       ),
     );
   }
-}
 
-class _QuizInfoView extends StatelessWidget {
-  const _QuizInfoView({
-    required this.title,
-    required this.message,
-    required this.onBack,
-    this.onRetry,
-    this.retryLabel,
-    this.icon,
-  });
-
-  final String title;
-  final String message;
-  final VoidCallback onBack;
-  final VoidCallback? onRetry;
-  final String? retryLabel;
-  final IconData? icon;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isError = message.contains('không thể tiếp tục') ||
-        message.contains('Không tải được');
+  Widget _buildGameHeader(QuizScreenState state, QuizScreenViewModel notifier, int currentIndex) {
+    final progress = (currentIndex + 1) / state.questions.length;
+    final timeStr = state.remainingSeconds != null ? _formatRemaining(state.remainingSeconds!) : "--:--";
+    final isWarning = (state.remainingSeconds ?? 999) < 60;
 
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            padding: const EdgeInsets.all(28),
-            decoration: BoxDecoration(
-              color: (isError ? Colors.red : Colors.blue).withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              icon ?? Icons.info_outline_rounded,
-              size: 64,
-              color: isError ? Colors.red : Colors.blue,
-            ),
-          ),
-          const SizedBox(height: 32),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-              color: const Color(0xFF1E293B),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: const Color(0xFF64748B),
-              height: 1.5,
-            ),
-          ),
-          const SizedBox(height: 48),
           Row(
             children: [
+              IconButton(
+                onPressed: _goBack,
+                icon: const Icon(Icons.close, color: Colors.white70),
+              ),
               Expanded(
-                child: OutlinedButton(
-                  onPressed: onBack,
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    side: const BorderSide(color: Color(0xFFE2E8F0), width: 2),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                  child: const Text(
-                    'QUAY LẠI',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.1,
-                      color: Color(0xFF475569),
-                    ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 12,
+                    backgroundColor: Colors.white.withValues(alpha: 0.1),
+                    valueColor: const AlwaysStoppedAnimation<Color>(GameQuizColors.primary),
                   ),
                 ),
               ),
-              if (onRetry != null) ...[
-                const SizedBox(width: 12),
-                Expanded(
-                  child: FilledButton(
-                    onPressed: onRetry,
-                    style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: theme.colorScheme.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      retryLabel?.toUpperCase() ?? 'TIẾP TỤC',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.1,
-                      ),
-                    ),
-                  ),
+              const SizedBox(width: 16),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: isWarning ? GameQuizColors.incorrect.withValues(alpha: 0.2) : Colors.white.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: isWarning ? GameQuizColors.incorrect : Colors.white24),
                 ),
-              ],
+                child: Row(
+                  children: [
+                    Icon(Icons.timer_outlined, size: 18, color: isWarning ? GameQuizColors.incorrect : Colors.white),
+                    const SizedBox(width: 4),
+                    Text(
+                      timeStr,
+                      style: TextStyle(
+                        color: isWarning ? GameQuizColors.incorrect : Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
+          const SizedBox(height: 8),
+          Text(
+            "Câu hỏi ${currentIndex + 1}/${state.questions.length}",
+            style: const TextStyle(color: GameQuizColors.textSecondary, fontWeight: FontWeight.w600),
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildBottomControls(QuizScreenState state, QuizScreenViewModel notifier, int currentIndex) {
+    final isLast = currentIndex == state.questions.length - 1;
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+      child: Row(
+        children: [
+          if (currentIndex > 0)
+            Expanded(
+              flex: 1,
+              child: OutlinedButton(
+                onPressed: notifier.previousQuestion,
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  side: const BorderSide(color: Colors.white24),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                ),
+                child: const Icon(Icons.arrow_back, color: Colors.white),
+              ),
+            ),
+          if (currentIndex > 0) const SizedBox(width: 12),
+          Expanded(
+            flex: 3,
+            child: FilledButton(
+              onPressed: isLast 
+                  ? () => _onSubmitPressed(state, notifier)
+                  : notifier.nextQuestion,
+              style: FilledButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                backgroundColor: isLast ? GameQuizColors.correct : GameQuizColors.primary,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                elevation: 8,
+                shadowColor: (isLast ? GameQuizColors.correct : GameQuizColors.primary).withValues(alpha: 0.5),
+              ),
+              child: Text(
+                isLast ? (state.isSubmitting ? "Đang nộp..." : "NỘP BÀI") : "TIẾP THEO",
+                style: TextStyle(
+                  color: isLast ? Colors.black : Colors.white,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 16,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(QuizScreenState state, QuizScreenViewModel notifier) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.quiz_outlined, size: 80, color: GameQuizColors.primary),
+            const SizedBox(height: 24),
+            Text(
+              state.quiz.title,
+              style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              state.errorMessage ?? "Sẵn sàng bắt đầu thử thách?",
+              style: const TextStyle(color: GameQuizColors.textSecondary, fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 48),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: () => notifier.startAttempt(),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  backgroundColor: GameQuizColors.primary,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                ),
+                child: const Text("BẮT ĐẦU LÀM BÀI", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextButton(
+              onPressed: _goBack,
+              child: const Text("Quay lại", style: TextStyle(color: GameQuizColors.textSecondary)),
+            ),
+          ],
+        ),
       ),
     );
   }

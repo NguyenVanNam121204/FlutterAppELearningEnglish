@@ -5,10 +5,12 @@ class FlashcardAudioButton extends StatelessWidget {
     super.key,
     required this.onPressed,
     required this.isPlaying,
+    this.size = 24.0,
   });
 
   final VoidCallback onPressed;
   final bool isPlaying;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +18,7 @@ class FlashcardAudioButton extends StatelessWidget {
       style: IconButton.styleFrom(
         backgroundColor: const Color(0xFFFACC15),
         foregroundColor: const Color(0xFF1F2937),
+        iconSize: size,
       ),
       tooltip: isPlaying ? 'Dừng phát âm' : 'Phát âm',
       onPressed: onPressed,

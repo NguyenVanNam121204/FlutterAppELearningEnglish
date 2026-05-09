@@ -19,6 +19,28 @@
   final double progressPercentage;
   final int totalLessons;
 
+  HomeCourseModel copyWith({
+    int? courseId,
+    String? title,
+    String? description,
+    String? imageUrl,
+    double? price,
+    bool? isEnrolled,
+    double? progressPercentage,
+    int? totalLessons,
+  }) {
+    return HomeCourseModel(
+      courseId: courseId ?? this.courseId,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      imageUrl: imageUrl ?? this.imageUrl,
+      price: price ?? this.price,
+      isEnrolled: isEnrolled ?? this.isEnrolled,
+      progressPercentage: progressPercentage ?? this.progressPercentage,
+      totalLessons: totalLessons ?? this.totalLessons,
+    );
+  }
+
   factory HomeCourseModel.fromSystemJson(Map<String, dynamic> json) {
     return HomeCourseModel(
       courseId: (json['courseId'] ?? json['CourseId'] ?? 0) as int,
@@ -65,5 +87,3 @@
     return double.tryParse(value.toString());
   }
 }
-
-

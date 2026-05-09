@@ -1,4 +1,4 @@
-﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../models/home/home_course_model.dart';
 import '../../models/streak/streak_model.dart';
@@ -60,10 +60,32 @@ class HomeViewModel extends StateNotifier<HomeState> {
       Failure() => <HomeCourseModel>[],
     };
 
-    final streak = switch (streakResult) {
+    final enrolledCourseIds = myCourses
+        .map((course) => course.courseId)
+        .toSet();
+
+    final mergedSuggestedCourses = suggestedCourses
+        .map(
+          (course) => course.copyWith(
+            isEnrolled:
+                course.isEnrolled ||
+                enrolledCourseIds.contains(course.courseId),
+          ),
+        )
+        .toList(growable: false);
+
+    var streak = switch (streakResult) {
       Success(value: final value) => value,
       Failure() => null,
     };
+
+    // Auto check-in if not active today
+    if (streak != null && !streak.isActiveToday) {
+      final checkinResult = await _homeRepository.checkinStreak();
+      if (checkinResult case Success(value: final updatedStreak)) {
+        streak = updatedStreak;
+      }
+    }
 
     String? error;
     if (myCoursesResult case Failure(error: final e)) {
@@ -78,7 +100,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
       isLoading: false,
       errorMessage: error,
       myCourses: myCourses,
-      suggestedCourses: suggestedCourses,
+      suggestedCourses: mergedSuggestedCourses,
       streak: streak,
     );
   }

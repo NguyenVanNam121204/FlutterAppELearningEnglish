@@ -53,30 +53,42 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen> {
         normalizedTypeName.contains('quiz');
 
     if (isFlashcard) {
-      context.push(
+      await context.push(
         '${RoutePaths.flashcardLearning}?moduleId=$moduleId&lessonId=${widget.lessonId}',
       );
+      if (mounted) {
+        ref.invalidate(lessonDetailBundleProvider(widget.lessonId));
+      }
       return;
     }
 
     if (isAssessment) {
-      context.push('${RoutePaths.assignmentDetail}?moduleId=$moduleId');
+      await context.push('${RoutePaths.assignmentDetail}?moduleId=$moduleId');
+      if (mounted) {
+        ref.invalidate(lessonDetailBundleProvider(widget.lessonId));
+      }
       return;
     }
 
     final courseId = widget.courseId;
     if (courseId.isNotEmpty) {
-      context.push(
+      await context.push(
         RoutePaths.courseLessonModule(
           courseId: courseId,
           lessonId: widget.lessonId,
           moduleId: moduleId,
         ),
       );
+      if (mounted) {
+        ref.invalidate(lessonDetailBundleProvider(widget.lessonId));
+      }
       return;
     }
 
-    context.push('${RoutePaths.moduleLearning}?moduleId=$moduleId');
+    await context.push('${RoutePaths.moduleLearning}?moduleId=$moduleId');
+    if (mounted) {
+      ref.invalidate(lessonDetailBundleProvider(widget.lessonId));
+    }
   }
 
   @override

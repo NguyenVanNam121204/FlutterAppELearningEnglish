@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -126,7 +126,7 @@ class QuizScreenViewModel extends StateNotifier<QuizScreenState> {
   QuizScreenViewModel(this._repository) : super(const QuizScreenState());
 
   static const String _cannotContinueMessage =
-      'Bài quiz này đã được nộp hoặc không thể tiếp tục. Vui lòng quay lại danh sách bài tập để làm quiz mới.';
+      'Không thể tiếp tục bài làm này. Vui lòng quay lại danh sách để bắt đầu lượt mới.';
 
   final QuizRepository _repository;
   Timer? _timer;
@@ -150,13 +150,26 @@ class QuizScreenViewModel extends StateNotifier<QuizScreenState> {
     String? resumeAttemptId,
     bool forceStartNew = false,
   }) async {
-    if (_quizId == quizId && state.questions.isNotEmpty) return;
+    // Proceed if starting new, or if we don't have questions yet, or if it's a different quiz,
+    // or if the previous attempt was already submitted.
+    final isSameQuiz = _quizId == quizId;
+    final hasData = state.questions.isNotEmpty;
+    final justSubmitted = state.submittedAttemptId != null;
+
+    if (isSameQuiz && hasData && !forceStartNew && !justSubmitted) return;
     _quizId = quizId;
     _resumeAttemptId = (resumeAttemptId ?? '').trim().isNotEmpty
         ? resumeAttemptId
         : null;
     _forceStartNew = forceStartNew;
+    
+    // Cancel any existing timers to prevent background sync for old attempts
     _timer?.cancel();
+    for (final timer in _answerSyncTimers.values) {
+      timer.cancel();
+    }
+    _answerSyncTimers.clear();
+
     state = const QuizScreenState(isLoading: true);
     final result = await _repository.quizById(quizId);
     switch (result) {
@@ -188,7 +201,11 @@ class QuizScreenViewModel extends StateNotifier<QuizScreenState> {
     bool forceStartNew = false,
   }) async {
     if ((_quizId ?? '').isEmpty || state.isStarting) return;
-    state = state.copyWith(isStarting: true, clearError: true);
+    state = state.copyWith(
+      isStarting: true,
+      clearError: true,
+      currentIndex: 0, // Force reset to first question when starting
+    );
 
     final explicitAttemptId = (resumeAttemptId ?? '').trim();
     if (explicitAttemptId.isNotEmpty) {
@@ -363,7 +380,7 @@ class QuizScreenViewModel extends StateNotifier<QuizScreenState> {
       userAnswer: value,
     );
     if (result case Failure<void>(:final error)) {
-      state = state.copyWith(errorMessage: error.message);
+      state = state.copyWith(errorMessage: _mapResumeFailureMessage(error.message));
     }
   }
 
@@ -468,28 +485,39 @@ class QuizScreenViewModel extends StateNotifier<QuizScreenState> {
       return;
     }
 
+    int? remaining;
+    if (attempt.durationMinutes != null && attempt.durationMinutes! > 0) {
+      if (attempt.startedAt != null) {
+        final endTime = attempt.startedAt!.add(Duration(minutes: attempt.durationMinutes!));
+        final diff = endTime.difference(DateTime.now().toUtc()).inSeconds;
+        remaining = diff > 0 ? diff : 0;
+      } else {
+        remaining = attempt.durationMinutes! * 60;
+      }
+    }
+
     state = state.copyWith(
       isStarting: false,
       attemptId: attempt.attemptId,
       quiz: nextQuiz,
       questions: nextQuestions,
-      answers: hydratedAnswers.isNotEmpty ? hydratedAnswers : state.answers,
+      answers: hydratedAnswers, // Use ONLY what came from backend
       currentIndex: 0,
-      remainingSeconds:
-          (attempt.durationMinutes != null && attempt.durationMinutes! > 0)
-          ? attempt.durationMinutes! * 60
-          : state.remainingSeconds,
+      remainingSeconds: remaining ?? state.remainingSeconds,
     );
     _startTimerIfNeeded();
   }
 
   String _mapResumeFailureMessage(String message) {
     final lowered = message.toLowerCase();
-    if (lowered.contains('not in progress') ||
-        lowered.contains('time has expired') ||
-        lowered.contains('auto-submitted') ||
-        lowered.contains('attempt not found')) {
-      return _cannotContinueMessage;
+    if (lowered.contains('not in progress') || lowered.contains('auto-submitted')) {
+      return 'Bài làm này đã được nộp hoặc đã kết thúc trước đó.';
+    }
+    if (lowered.contains('time has expired') || lowered.contains('expired')) {
+      return '⏰ Thời gian làm bài đã hết. Bài làm của bạn đã được tự động nộp.';
+    }
+    if (lowered.contains('attempt not found')) {
+      return 'Không tìm thấy dữ liệu bài làm cũ. Vui lòng bắt đầu bài mới.';
     }
     return message;
   }

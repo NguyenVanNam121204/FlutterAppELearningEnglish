@@ -85,6 +85,33 @@ class QuizRepository {
     }
   }
 
+  Future<Result<QuizAttemptResultModel>> getAttemptResult(
+    String attemptId,
+  ) async {
+    try {
+      final response = await _apiService.get('user/quiz-attempts/result/$attemptId');
+      return Success(QuizAttemptResultModel.fromJson(_asMap(response.data)));
+    } on DioException catch (error) {
+      return Failure(_mapDioException(error));
+    } catch (_) {
+      return const Failure(AppError(message: 'Unable to load quiz result detail.'));
+    }
+  }
+
+  Future<Result<List<QuizHistoryItemModel>>> getQuizHistory(
+    String quizId,
+  ) async {
+    try {
+      final response = await _apiService.get('user/quiz-attempts/history/$quizId');
+      final list = _asMapList(response.data);
+      return Success(list.map(QuizHistoryItemModel.fromJson).toList());
+    } on DioException catch (error) {
+      return Failure(_mapDioException(error));
+    } catch (_) {
+      return const Failure(AppError(message: 'Unable to load quiz history.'));
+    }
+  }
+
   Future<Result<void>> updateAnswer({
     required String attemptId,
     required String questionId,
@@ -113,6 +140,17 @@ class QuizRepository {
       return raw;
     }
     return const {};
+  }
+
+  List<Map<String, dynamic>> _asMapList(Object? raw) {
+    if (raw is List) {
+      return raw.cast<Map<String, dynamic>>();
+    }
+    if (raw is Map<String, dynamic>) {
+      final data = raw['data'] ?? raw['Data'] ?? raw;
+      if (data is List) return data.cast<Map<String, dynamic>>();
+    }
+    return const [];
   }
 
   AppError _mapDioException(DioException error) {

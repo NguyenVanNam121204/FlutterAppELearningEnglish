@@ -94,10 +94,10 @@ class EssayResultWidget extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   submission.score!,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 64,
                     fontWeight: FontWeight.w900,
-                    color: Color(0xFF1E293B),
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
               ],
@@ -114,7 +114,7 @@ class EssayResultWidget extends StatelessWidget {
             children: [
               Text(
                 instruction,
-                style: const TextStyle(color: Colors.black87),
+                style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color),
               ),
               if (audioUrl != null) ...[
                 const SizedBox(height: 12),
@@ -154,9 +154,9 @@ class EssayResultWidget extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade200),
+            border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,10 +165,10 @@ class EssayResultWidget extends StatelessWidget {
                 submission.textContent.isNotEmpty
                     ? submission.textContent
                     : '(Không có nội dung văn bản)',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   height: 1.5,
-                  color: Color(0xFF334155),
+                  color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.9),
                 ),
               ),
               if (submission.attachmentUrl != null) ...[
@@ -210,22 +210,22 @@ class EssayResultWidget extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF1F5F9),
+                      color: Theme.of(context).cardColor.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                      border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
                     ),
                     child: Row(
                       children: [
                         const Icon(Icons.description_outlined,
                             color: Color(0xFF475569)),
                         const SizedBox(width: 12),
-                        const Expanded(
+                        Expanded(
                           child: Text(
                             'Xem bài làm file đính kèm',
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: Color(0xFF334155),
+                              color: Theme.of(context).textTheme.bodyLarge?.color,
                             ),
                           ),
                         ),
@@ -248,16 +248,16 @@ class EssayResultWidget extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
+              color: Theme.of(context).cardColor.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
             ),
             child: Text(
               submission.feedback!,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontStyle: FontStyle.italic,
-                color: Color(0xFF475569),
+                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
               ),
             ),
           ),
@@ -298,10 +298,10 @@ class _SectionTitle extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12, left: 4),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontWeight: FontWeight.w800,
           fontSize: 14,
-          color: Color(0xFF64748B),
+          color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
           letterSpacing: 0.5,
         ),
       ),

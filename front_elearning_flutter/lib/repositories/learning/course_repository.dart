@@ -4,6 +4,7 @@ import '../../core/constants/api_constants.dart';
 import '../../core/errors/app_error.dart';
 import '../../core/result/result.dart';
 import '../../models/learning/course_models.dart';
+import '../../models/my_course/my_course_models.dart';
 import '../../services/api_service.dart';
 
 class CourseRepository {
@@ -38,6 +39,39 @@ class CourseRepository {
     } catch (_) {
       return const Failure(AppError(message: 'Unable to search courses.'));
     }
+  }
+
+  Future<Result<List<MyCourseItemModel>>> myEnrolledCourses({
+    int pageNumber = 1,
+    int pageSize = 20,
+  }) async {
+    try {
+      final response = await _apiService.get(
+        ApiConstants.myEnrolledCourses,
+        queryParameters: {'pageNumber': pageNumber, 'pageSize': pageSize},
+      );
+      return Success(_asMyCourseItems(response.data));
+    } on DioException catch (error) {
+      return Failure(_mapDioException(error));
+    } catch (_) {
+      return const Failure(AppError(message: 'Unable to load your courses.'));
+    }
+  }
+
+  List<MyCourseItemModel> _asMyCourseItems(Object? raw) {
+    if (raw is Map<String, dynamic>) {
+      final payload = raw['data'] ?? raw['Data'];
+      if (payload is Map<String, dynamic>) {
+        final items = payload['items'] ?? payload['Items'] ?? const [];
+        if (items is List) {
+          return items
+              .whereType<Map<String, dynamic>>()
+              .map(MyCourseItemModel.fromJson)
+              .toList();
+        }
+      }
+    }
+    return const [];
   }
 
   Map<String, dynamic> _asMap(Object? raw) {

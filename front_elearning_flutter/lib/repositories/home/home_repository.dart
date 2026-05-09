@@ -83,6 +83,23 @@ class HomeRepository {
     }
   }
 
+  Future<Result<StreakModel>> checkinStreak() async {
+    try {
+      await _apiService.post('${ApiConstants.streak}/checkin');
+      // or just return the updated streak value.
+      // Based on the backend StreakUpdateResultDto: Success, NewCurrentStreak, NewLongestStreak, IsNewRecord, Message
+      
+      // Let's just fetch the streak again after checkin to be safe and consistent with the model
+      return getStreak();
+    } on DioException catch (error) {
+      return Failure(_mapDioException(error));
+    } catch (_) {
+      return const Failure(
+        AppError(message: 'Không thể cập nhật streak.'),
+      );
+    }
+  }
+
   AppError _mapDioException(DioException error) {
     final responseData = error.response?.data;
     final message = responseData is Map<String, dynamic>

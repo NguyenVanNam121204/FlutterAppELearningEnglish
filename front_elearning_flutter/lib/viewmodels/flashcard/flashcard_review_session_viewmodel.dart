@@ -3,6 +3,7 @@
 import '../../core/result/result.dart';
 import '../../models/flashcard/flashcard_models.dart';
 import 'flashcard_feature_viewmodel.dart';
+import '../../app/providers.dart';
 
 class FlashcardReviewSessionState {
   const FlashcardReviewSessionState({
@@ -46,10 +47,11 @@ class FlashcardReviewSessionState {
 
 class FlashcardReviewSessionViewModel
     extends StateNotifier<FlashcardReviewSessionState> {
-  FlashcardReviewSessionViewModel(this._feature)
+  FlashcardReviewSessionViewModel(this._feature, this._ref)
     : super(const FlashcardReviewSessionState());
 
   final FlashcardFeatureViewModel _feature;
+  final Ref _ref;
   bool _initialized = false;
 
   Future<void> initialize() async {
@@ -139,6 +141,12 @@ class FlashcardReviewSessionViewModel
       state = state.copyWith(isSubmitting: false);
       return;
     }
+
+    // Invalidate the global due list so screens like Vocabulary refresh immediately
+    // after a successful review action.
+    try {
+      _ref.invalidate(dueReviewCardsProvider);
+    } catch (_) {}
 
     final mastered = quality >= 4 ? state.mastered + 1 : state.mastered;
     if (state.index < state.cards.length - 1) {

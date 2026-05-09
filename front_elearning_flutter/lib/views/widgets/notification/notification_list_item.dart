@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../../../models/notification/notification_model.dart';
 
@@ -24,16 +24,24 @@ class NotificationListItem extends StatelessWidget {
     final isRead = item.isRead;
     final type = item.type;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return InkWell(
       onTap: onTap,
       child: Container(
-        color: isRead ? null : const Color(0xFFF0F7FF),
+        color: isRead
+            ? null
+            : (isDark
+                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.15)
+                : const Color(0xFFF0F7FF)),
         padding: const EdgeInsets.all(12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CircleAvatar(
-              backgroundColor: const Color(0xFFEFF2FF),
+              backgroundColor: isDark
+                  ? Colors.white.withValues(alpha: 0.1)
+                  : const Color(0xFFEFF2FF),
               child: Icon(
                 iconOf(type),
                 color: Theme.of(context).colorScheme.primary,

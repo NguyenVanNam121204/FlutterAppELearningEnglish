@@ -47,6 +47,8 @@ class RoutePaths {
   static const lectureDetail = '/lecture-detail';
   static const assignmentDetail = '/assignment-detail';
   static const quiz = '/quiz';
+  static const quizResultDetail = '/quiz-result-detail';
+  static const quizHistory = '/quiz-history';
   static const lessonResult = '/lesson-result';
   static const essay = '/essay';
 

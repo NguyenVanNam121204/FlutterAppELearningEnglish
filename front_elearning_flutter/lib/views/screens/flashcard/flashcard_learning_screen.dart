@@ -14,6 +14,7 @@ import '../../widgets/common/catalunya_scaffold.dart';
 import '../../widgets/common/empty_state_view.dart';
 import '../../widgets/common/state_views.dart';
 import '../../widgets/flashcard/flashcard_audio_button.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class FlashCardLearningScreen extends ConsumerStatefulWidget {
   const FlashCardLearningScreen({
@@ -70,6 +71,17 @@ class _FlashCardLearningScreenState
     }
 
     if (!mounted) return;
+
+    // Invalidate providers to refresh review and notebook data
+    ref.invalidate(flashcardReviewSessionViewModelProvider);
+    ref.invalidate(flashcardFeatureViewModelProvider);
+    ref.invalidate(dueReviewCardsProvider);
+    ref.invalidate(notebookViewModelProvider);
+
+    // Also try to find and invalidate providers defined in screens
+    // For example, the one in vocabulary_screen.dart (if accessible by name,
+    // but the app/providers.dart is better for global ones)
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Đã thêm từ vào danh sách ôn tập')),
     );
@@ -169,15 +181,35 @@ class _FlashCardLearningScreenState
     }
     return CatalunyaScaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.close_rounded),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: const Text('Học flashcard'),
         actions: [
           if (widget.moduleId.isNotEmpty)
-            IconButton(
-              tooltip: 'Luyện phát âm',
-              onPressed: () => context.push(
-                '${RoutePaths.pronunciation}?moduleId=${widget.moduleId}',
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: Container(
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color(0xFF22D3EE),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0x33000000),
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: IconButton(
+                  tooltip: 'Luyện phát âm',
+                  onPressed: () => context.push(
+                    '${RoutePaths.pronunciation}?moduleId=${widget.moduleId}',
+                  ),
+                  icon: const Icon(Icons.mic_rounded, color: Colors.white),
+                ),
               ),
-              icon: const Icon(Icons.mic_rounded),
             ),
         ],
       ),
@@ -186,87 +218,159 @@ class _FlashCardLearningScreenState
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                color: Colors.white.withValues(alpha: 0.85),
-                border: Border.all(color: const Color(0xFFD8E6F8)),
+                borderRadius: BorderRadius.circular(24),
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.white.withValues(alpha: 0.95),
+                    Colors.white.withValues(alpha: 0.85),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.6)),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF0EA5E9).withValues(alpha: 0.08),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
               ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Tiến độ',
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.auto_awesome_rounded,
+                            size: 18,
+                            color: Color(0xFF0EA5E9),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Tiến độ Flashcard',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF1E293B),
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        '${state.index + 1} / ${state.cards.length}',
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF0EA5E9).withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '${state.index + 1} / ${state.cards.length}',
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF0369A1),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  LinearProgressIndicator(
-                    value: (state.index + 1) / state.cards.length,
-                    minHeight: 8,
-                    borderRadius: BorderRadius.circular(999),
+                  const SizedBox(height: 12),
+                  Stack(
+                    children: [
+                      Container(
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF1F5F9),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                      ),
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeOutCubic,
+                        height: 8,
+                        width:
+                            (MediaQuery.of(context).size.width - 72) *
+                            ((state.index + 1) / state.cards.length),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF0EA5E9), Color(0xFF22D3EE)],
+                          ),
+                          borderRadius: BorderRadius.circular(999),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(
+                                0xFF0EA5E9,
+                              ).withValues(alpha: 0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Expanded(
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  final cardWidth = math.min(constraints.maxWidth * 0.9, 420.0);
+                  final cardWidth = math.min(constraints.maxWidth, 420.0);
                   final cardHeight = math.min(
-                    constraints.maxHeight * 0.84,
-                    560.0,
+                    constraints.maxHeight * 0.95,
+                    650.0,
                   );
 
                   return Center(
-                    child: SizedBox(
-                      width: cardWidth,
-                      height: cardHeight,
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 280),
-                        switchInCurve: Curves.easeOutCubic,
-                        switchOutCurve: Curves.easeInCubic,
-                        transitionBuilder: (child, animation) {
-                          final offset = Tween<Offset>(
-                            begin: Offset(_slideFromRight ? 0.16 : -0.16, 0),
-                            end: Offset.zero,
-                          ).animate(animation);
-                          return FadeTransition(
-                            opacity: animation,
-                            child: SlideTransition(
-                              position: offset,
-                              child: child,
-                            ),
-                          );
-                        },
-                        child: _FlashcardFlipCard(
-                          key: ValueKey('card-${state.index}'),
-                          flipped: state.flipped,
-                          word: word,
-                          frontSentence: example,
-                          pronunciation: pronunciation,
-                          definition: definition,
-                          partOfSpeech: partOfSpeech,
-                          exampleTranslation: exampleTranslation,
-                          imageUrl: imageUrl,
-                          audioUrl: audioUrl,
-                          isPlaying: _isPlaying && _playingUrl == audioUrl,
-                          onToggle: notifier.toggleCard,
-                          onPlayAudio: audioUrl.isEmpty
-                              ? null
-                              : () => _playAudio(audioUrl),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: cardWidth,
+                        maxHeight: cardHeight,
+                      ),
+                      child: IntrinsicHeight(
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 350),
+                          switchInCurve: Curves.easeOutQuart,
+                          switchOutCurve: Curves.easeInQuart,
+                          transitionBuilder: (child, animation) {
+                            final offset = Tween<Offset>(
+                              begin: Offset(_slideFromRight ? 0.2 : -0.2, 0),
+                              end: Offset.zero,
+                            ).animate(animation);
+                            return FadeTransition(
+                              opacity: animation,
+                              child: SlideTransition(
+                                position: offset,
+                                child: child,
+                              ),
+                            );
+                          },
+                          child: _FlashcardFlipCard(
+                            key: ValueKey('card-${state.index}'),
+                            flipped: state.flipped,
+                            word: word,
+                            frontSentence: example,
+                            pronunciation: pronunciation,
+                            definition: definition,
+                            partOfSpeech: partOfSpeech,
+                            exampleTranslation: exampleTranslation,
+                            imageUrl: imageUrl,
+                            audioUrl: audioUrl,
+                            isPlaying: _isPlaying && _playingUrl == audioUrl,
+                            onToggle: notifier.toggleCard,
+                            onPlayAudio: audioUrl.isEmpty
+                                ? null
+                                : () => _playAudio(audioUrl),
+                          ),
                         ),
                       ),
                     ),
@@ -274,43 +378,109 @@ class _FlashCardLearningScreenState
                 },
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 20),
             Row(
               children: [
                 Expanded(
-                  child: OutlinedButton.icon(
-                    icon: const Icon(Icons.chevron_left_rounded),
-                    onPressed: state.index == 0
-                        ? null
-                        : () async {
-                            await _stopAudio();
-                            notifier.previous();
-                          },
-                    label: const Text('Trước'),
+                  child: SizedBox(
+                    height: 56,
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        side: const BorderSide(color: Color(0xFFE5E7EB)),
+                        backgroundColor: Colors.white,
+                      ),
+                      onPressed: state.index == 0
+                          ? null
+                          : () async {
+                              await _stopAudio();
+                              notifier.previous();
+                            },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.chevron_left_rounded,
+                            color: state.index == 0
+                                ? Colors.grey
+                                : const Color(0xFF0EA5E9),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Trước',
+                            style: TextStyle(
+                              color: state.index == 0
+                                  ? Colors.grey
+                                  : const Color(0xFF374151),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 12),
                 Expanded(
-                  child: FilledButton.icon(
-                    icon: Icon(
-                      state.index == state.cards.length - 1
-                          ? Icons.check_circle_outline_rounded
-                          : Icons.chevron_right_rounded,
+                  child: Container(
+                    height: 56,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF0EA5E9), Color(0xFF22D3EE)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF0EA5E9).withValues(alpha: 0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    onPressed: _isCompleting
-                        ? null
-                        : () async {
-                            final done = notifier.next();
-                            if (done) {
-                              await _handleComplete();
-                            }
-                          },
-                    label: Text(
-                      _isCompleting
-                          ? 'Đang xử lý...'
-                          : state.index == state.cards.length - 1
-                          ? 'Hoàn thành'
-                          : 'Tiếp theo',
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      onPressed: _isCompleting
+                          ? null
+                          : () async {
+                              final done = notifier.next();
+                              if (done) {
+                                await _handleComplete();
+                              }
+                            },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            _isCompleting
+                                ? 'Đang xử lý...'
+                                : state.index == state.cards.length - 1
+                                ? 'Hoàn thành'
+                                : 'Tiếp theo',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Icon(
+                            state.index == state.cards.length - 1
+                                ? Icons.check_circle_outline_rounded
+                                : Icons.arrow_forward_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -366,7 +536,7 @@ class _FlashcardFlipCardState extends State<_FlashcardFlipCard>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 380),
+      duration: const Duration(milliseconds: 400),
       value: widget.flipped ? 1 : 0,
     );
   }
@@ -395,6 +565,7 @@ class _FlashcardFlipCardState extends State<_FlashcardFlipCard>
       word: widget.word,
       frontSentence: widget.frontSentence,
       imageUrl: widget.imageUrl,
+      partOfSpeech: widget.partOfSpeech,
       isPlaying: widget.isPlaying,
       onPlayAudio: widget.onPlayAudio,
     );
@@ -419,22 +590,19 @@ class _FlashcardFlipCardState extends State<_FlashcardFlipCard>
           final isFront = _controller.value <= 0.5;
 
           final transform = Matrix4.identity()
-            ..setEntry(3, 2, 0.0012)
+            ..setEntry(3, 2, 0.001)
             ..rotateY(angle);
 
-          return SizedBox(
-            width: double.infinity,
-            child: Transform(
-              transform: transform,
-              alignment: Alignment.center,
-              child: isFront
-                  ? front
-                  : Transform(
-                      alignment: Alignment.center,
-                      transform: Matrix4.identity()..rotateY(math.pi),
-                      child: back,
-                    ),
-            ),
+          return Transform(
+            transform: transform,
+            alignment: Alignment.center,
+            child: isFront
+                ? front
+                : Transform(
+                    alignment: Alignment.center,
+                    transform: Matrix4.identity()..rotateY(math.pi),
+                    child: back,
+                  ),
           );
         },
       ),
@@ -447,6 +615,7 @@ class _FrontCardFace extends StatelessWidget {
     required this.word,
     required this.frontSentence,
     required this.imageUrl,
+    required this.partOfSpeech,
     required this.isPlaying,
     required this.onPlayAudio,
   });
@@ -454,6 +623,7 @@ class _FrontCardFace extends StatelessWidget {
   final String word;
   final String frontSentence;
   final String imageUrl;
+  final String partOfSpeech;
   final bool isPlaying;
   final VoidCallback? onPlayAudio;
 
@@ -461,74 +631,281 @@ class _FrontCardFace extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(32),
         color: Colors.white,
-        border: Border.all(color: const Color(0xFFD7DEE8)),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Color(0x22000000),
-            blurRadius: 14,
-            offset: Offset(0, 8),
+            color: const Color(0xFF000000).withValues(alpha: 0.1),
+            blurRadius: 30,
+            offset: const Offset(0, 12),
           ),
         ],
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: LayoutBuilder(
-          builder: (context, constraints) => SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(32),
+        child: Stack(
+          children: [
+            // Decorative background patterns
+            Positioned(
+              top: -30,
+              right: -30,
+              child: Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFF0EA5E9).withValues(alpha: 0.08),
+                      const Color(0xFF22D3EE).withValues(alpha: 0.02),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 40,
+              left: -20,
+              child: Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFF0EA5E9).withValues(alpha: 0.03),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (onPlayAudio != null)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: FlashcardAudioButton(
-                        isPlaying: isPlaying,
-                        onPressed: onPlayAudio!,
+                  Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      if (imageUrl.isNotEmpty)
+                        Hero(
+                          tag: 'card-image-$imageUrl',
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(28),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
+                            ),
+                            child: _CardImage(imageUrl: imageUrl, height: 220),
+                          ),
+                        )
+                      else
+                        Container(
+                          height: 130,
+                          width: double.infinity,
+                          margin: const EdgeInsets.only(bottom: 12),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFF8FAFC), Color(0xFFF1F5F9)],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                            ),
+                            borderRadius: BorderRadius.circular(28),
+                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.image_outlined,
+                                size: 56,
+                                color: Color(0xFFCBD5E1),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'No Image Available',
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  color: const Color(0xFF94A3B8),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      if (onPlayAudio != null)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 12, bottom: 4),
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: FlashcardAudioButton(
+                              isPlaying: isPlaying,
+                              onPressed: onPlayAudio!,
+                              size: 28,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 8),
+                          if (partOfSpeech.isNotEmpty)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFF0EA5E9),
+                                    Color(0xFF22D3EE),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(999),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(
+                                      0xFF0EA5E9,
+                                    ).withValues(alpha: 0.2),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Text(
+                                partOfSpeech.toUpperCase(),
+                                style: GoogleFonts.inter(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
+                                  letterSpacing: 1.5,
+                                ),
+                              ),
+                            ),
+                          const SizedBox(height: 12),
+                          Text(
+                            word,
+                            style: GoogleFonts.outfit(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w900,
+                              color: const Color(0xFF0F172A),
+                              letterSpacing: -1,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          if (frontSentence.trim().isNotEmpty)
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 16,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF8FAFC),
+                                borderRadius: BorderRadius.circular(24),
+                                border: Border.all(
+                                  color: const Color(0xFFE2E8F0),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Column(
+                                children: [
+                                  Icon(
+                                    Icons.format_quote_rounded,
+                                    color: const Color(
+                                      0xFF0EA5E9,
+                                    ).withValues(alpha: 0.3),
+                                    size: 24,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    frontSentence,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: const Color(0xFF334155),
+                                      height: 1.6,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          const SizedBox(height: 16),
+                        ],
                       ),
-                    ),
-                  if (imageUrl.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 14),
-                      child: _CardImage(imageUrl: imageUrl, height: 130),
-                    )
-                  else
-                    const Padding(
-                      padding: EdgeInsets.only(bottom: 14),
-                      child: _CardImage(imageUrl: '', height: 110),
-                    ),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
-                    ),
-                    child: Text(
-                      frontSentence.trim().isNotEmpty ? frontSentence : word,
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: const Color(0xFF1F2937),
-                        fontWeight: FontWeight.w600,
-                        height: 1.32,
-                      ),
-                      textAlign: TextAlign.center,
                     ),
                   ),
-                  const SizedBox(height: 14),
-                  const Text(
-                    'Ấn vào thẻ để lật',
-                    style: TextStyle(
-                      color: Colors.black45,
-                      fontWeight: FontWeight.w500,
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        top: BorderSide(
+                          color: const Color(0xFFF1F5F9),
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TweenAnimationBuilder<double>(
+                          duration: const Duration(seconds: 2),
+                          tween: Tween(begin: 0.0, end: 1.0),
+                          onEnd: () {},
+                          builder: (context, value, child) {
+                            return Opacity(
+                              opacity:
+                                  0.5 +
+                                  (math.sin(value * math.pi * 2) * 0.5).abs(),
+                              child: child,
+                            );
+                          },
+                          child: const Icon(
+                            Icons.touch_app_rounded,
+                            size: 20,
+                            color: Color(0xFF94A3B8),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          'ẤN ĐỂ XEM CHI TIẾT',
+                          style: GoogleFonts.inter(
+                            color: const Color(0xFF94A3B8),
+                            fontWeight: FontWeight.w800,
+                            fontSize: 12,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -560,119 +937,223 @@ class _BackCardFace extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: const Color(0xFFF7F9FC),
-        border: Border.all(color: const Color(0xFFD7DEE8)),
-        boxShadow: const [
+        borderRadius: BorderRadius.circular(32),
+        gradient: const LinearGradient(
+          colors: [Color(0xFFF0F9FF), Color(0xFFE0F2FE)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
           BoxShadow(
-            color: Color(0x22000000),
-            blurRadius: 14,
-            offset: Offset(0, 8),
+            color: const Color(0xFF0EA5E9).withValues(alpha: 0.1),
+            blurRadius: 30,
+            offset: const Offset(0, 12),
           ),
         ],
+        border: Border.all(color: const Color(0xFFBAE6FD), width: 1.5),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: LayoutBuilder(
-          builder: (context, constraints) => SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(32),
+        child: Stack(
+          children: [
+            // Decorative background elements
+            Positioned(
+              bottom: -50,
+              left: -50,
+              child: Container(
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFF0EA5E9).withValues(alpha: 0.05),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 20,
+              right: 20,
+              child: Icon(
+                Icons.lightbulb_outline_rounded,
+                color: const Color(0xFF0EA5E9).withValues(alpha: 0.1),
+                size: 60,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (onPlayAudio != null)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: FlashcardAudioButton(
-                        isPlaying: isPlaying,
-                        onPressed: onPlayAudio!,
-                      ),
-                    ),
-                  if (imageUrl.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: _CardImage(imageUrl: imageUrl, height: 120),
-                    ),
-                  Text(
-                    word,
-                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: const Color(0xFF111827),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  if (pronunciation.trim().isNotEmpty) ...[
-                    const SizedBox(height: 6),
-                    Text(
-                      '/$pronunciation/',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Colors.black54,
-                        fontStyle: FontStyle.italic,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                  if (partOfSpeech.trim().isNotEmpty) ...[
-                    const SizedBox(height: 6),
-                    Text(
-                      partOfSpeech,
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: const Color(0xFF64748B),
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 10),
-                  if (definition.trim().isNotEmpty)
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFE0E6EF)),
-                      ),
-                      child: Text(
-                        definition,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(
-                              color: const Color(0xFF111827),
-                              fontWeight: FontWeight.w700,
+                  Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      if (imageUrl.isNotEmpty)
+                        Hero(
+                          tag: 'card-image-$imageUrl',
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(28),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 5),
+                                ),
+                              ],
                             ),
-                      ),
-                    ),
-                  const SizedBox(height: 12),
-                  if (exampleTranslation.trim().isNotEmpty)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF8FAFC),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        exampleTranslation,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          color: const Color(0xFF475569),
-                          height: 1.3,
+                            child: _CardImage(
+                              imageUrl: imageUrl,
+                              height: 220,
+                              isBack: true,
+                            ),
+                          ),
                         ),
+                      if (onPlayAudio != null)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 12, bottom: 4),
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: FlashcardAudioButton(
+                              isPlaying: isPlaying,
+                              onPressed: onPlayAudio!,
+                              size: 28,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 8),
+                          Text(
+                            word,
+                            style: GoogleFonts.outfit(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w900,
+                              color: const Color(0xFF0F172A),
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          if (pronunciation.isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(
+                                  0xFF0EA5E9,
+                                ).withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                '/$pronunciation/',
+                                style: GoogleFonts.inter(
+                                  fontSize: 18,
+                                  color: const Color(0xFF0369A1),
+                                  fontStyle: FontStyle.italic,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                          const SizedBox(height: 20),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(
+                                color: const Color(0xFFBAE6FD),
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                Text(
+                                  definition,
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w800,
+                                    color: const Color(0xFF1E293B),
+                                    height: 1.3,
+                                  ),
+                                ),
+                                if (exampleTranslation.isNotEmpty) ...[
+                                  const SizedBox(height: 16),
+                                  Container(
+                                    height: 2,
+                                    width: 40,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFBAE6FD),
+                                      borderRadius: BorderRadius.circular(999),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    exampleTranslation,
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      color: const Color(0xFF475569),
+                                      height: 1.5,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                        ],
                       ),
                     ),
-                  const SizedBox(height: 14),
-                  const Text(
-                    'Ấn vào thẻ để lật',
-                    style: TextStyle(
-                      color: Colors.black54,
-                      fontWeight: FontWeight.w600,
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.flip_camera_android_rounded,
+                          size: 18,
+                          color: const Color(0xFF94A3B8),
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          'LẬT LẠI MẶT TRƯỚC',
+                          style: GoogleFonts.inter(
+                            color: const Color(0xFF94A3B8),
+                            fontWeight: FontWeight.w800,
+                            fontSize: 12,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -680,10 +1161,15 @@ class _BackCardFace extends StatelessWidget {
 }
 
 class _CardImage extends StatelessWidget {
-  const _CardImage({required this.imageUrl, required this.height});
+  const _CardImage({
+    required this.imageUrl,
+    required this.height,
+    this.isBack = false,
+  });
 
   final String imageUrl;
   final double height;
+  final bool isBack;
 
   String _resolveUrl(String raw) {
     final trimmed = raw.trim();
@@ -713,28 +1199,33 @@ class _CardImage extends StatelessWidget {
       height: height,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: const Color(0xFFF2F5FA),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE0E6EF)),
+        color: isBack ? Colors.white.withValues(alpha: 0.1) : Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: isBack
+              ? Colors.white.withValues(alpha: 0.3)
+              : const Color(0xFFF1F5F9),
+          width: 1,
+        ),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(24),
         child: resolvedUrl.isEmpty
-            ? const Center(
+            ? Center(
                 child: Icon(
                   Icons.image_outlined,
-                  size: 38,
-                  color: Color(0xFF94A3B8),
+                  size: 48,
+                  color: isBack ? Colors.white70 : const Color(0xFF9CA3AF),
                 ),
               )
             : Image.network(
                 resolvedUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => const Center(
+                errorBuilder: (_, _, _) => Center(
                   child: Icon(
                     Icons.broken_image_outlined,
-                    size: 38,
-                    color: Color(0xFF94A3B8),
+                    size: 48,
+                    color: isBack ? Colors.white70 : const Color(0xFF9CA3AF),
                   ),
                 ),
               ),

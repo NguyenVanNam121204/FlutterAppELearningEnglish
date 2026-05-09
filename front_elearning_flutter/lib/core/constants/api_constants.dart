@@ -22,7 +22,7 @@ class ApiConstants {
 
   static const notifications = '$userBase/notifications';
   static const notificationsUnreadCount = '$notifications/unread-count';
-  static const vocabularyNotebook = '$userBase/vocabulary/notebook';
+  static const vocabularyNotebook = '$userFlashcardReview/mastered';
 
   static const paymentProcess = '$userBase/payments/process';
   static const paymentHistory = '$userBase/payments/history';

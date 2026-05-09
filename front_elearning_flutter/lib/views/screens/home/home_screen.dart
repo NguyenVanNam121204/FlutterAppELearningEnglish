@@ -23,6 +23,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  late final AppLifecycleListener _lifecycleListener;
   Set<int>? _enrollingCourseIdsState;
   Timer? _notificationPollingTimer;
 
@@ -37,6 +38,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _lifecycleListener = AppLifecycleListener(
+      onResume: () {
+        if (mounted) {
+          ref.read(homeViewModelProvider.notifier).loadHomeData();
+          ref.invalidate(notificationUnreadCountProvider);
+        }
+      },
+    );
     Future.microtask(() {
       ref.read(homeViewModelProvider.notifier).loadHomeData();
     });
@@ -50,6 +59,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   void dispose() {
+    _lifecycleListener.dispose();
     _notificationPollingTimer?.cancel();
     super.dispose();
   }
@@ -98,6 +108,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     switch (result) {
       case Success<void>():
         ref.invalidate(notificationUnreadCountProvider);
+        ref.invalidate(myCoursesListProvider);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
