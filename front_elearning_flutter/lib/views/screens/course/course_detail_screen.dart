@@ -1,16 +1,16 @@
-import 'dart:async';
+﻿import "dart:async";
+import "package:flutter/material.dart";
+import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:flutter_markdown/flutter_markdown.dart";
+import "package:go_router/go_router.dart";
+import "package:cached_network_image/cached_network_image.dart";
+import "package:google_fonts/google_fonts.dart";
 
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:go_router/go_router.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-
-import '../../../app/providers.dart';
-import '../../../app/router/route_paths.dart';
-import '../../../core/result/result.dart';
-import '../../widgets/common/catalunya_scaffold.dart';
-import '../../widgets/common/state_views.dart';
+import "../../../app/providers.dart";
+import "../../../app/router/route_paths.dart";
+import "../../../core/result/result.dart";
+import "../../widgets/common/catalunya_scaffold.dart";
+import "../../widgets/common/state_views.dart";
 
 class CourseDetailScreen extends ConsumerStatefulWidget {
   const CourseDetailScreen({required this.courseId, super.key});
@@ -49,7 +49,7 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Đăng ký khóa học "$courseTitle" thành công. Vui lòng kiểm tra thông báo và email.',
+              "Đăng ký khóa học $courseTitle thành công. Vui lòng kiểm tra thông báo và email.",
             ),
           ),
         );
@@ -89,7 +89,6 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
             children: [
               CustomScrollView(
                 slivers: [
-                  // Immersive Header Image
                   SliverAppBar(
                     expandedHeight: 300,
                     pinned: true,
@@ -137,7 +136,7 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
                         children: [
                           if (imageUrl.isNotEmpty)
                             Hero(
-                              tag: 'course_image_$courseId',
+                              tag: "course_image_$courseId",
                               child: CachedNetworkImage(
                                 imageUrl: imageUrl,
                                 fit: BoxFit.cover,
@@ -171,7 +170,6 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
                                 color: Colors.white24,
                               ),
                             ),
-                          // Subtle overlay gradient for better text contrast
                           const DecoratedBox(
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
@@ -187,7 +185,6 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
                     ),
                   ),
 
-                  // Course Information Section
                   SliverToBoxAdapter(
                     child: Container(
                       padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
@@ -211,7 +208,7 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: const Text(
-                                        'E-LEARNING',
+                                        "E-LEARNING",
                                         style: TextStyle(
                                           color: Color(0xFF0284C7),
                                           fontSize: 10,
@@ -223,10 +220,10 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
                                     const SizedBox(height: 12),
                                     Text(
                                       title,
-                                      style: const TextStyle(
+                                      style: GoogleFonts.outfit(
                                         fontSize: 28,
                                         fontWeight: FontWeight.w900,
-                                        color: Color(0xFF0F172A),
+                                        color: const Color(0xFF0F172A),
                                         height: 1.1,
                                         letterSpacing: -0.5,
                                       ),
@@ -261,7 +258,7 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
                               ),
                               SizedBox(width: 8),
                               Text(
-                                'Giới thiệu khóa học',
+                                "Giới thiệu khóa học",
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w800,
@@ -291,9 +288,7 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
                                   ),
                                 ),
                           ),
-                          const SizedBox(
-                            height: 140,
-                          ), // Bottom padding for button
+                          const SizedBox(height: 140),
                         ],
                       ),
                     ),
@@ -301,7 +296,6 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
                 ],
               ),
 
-              // Bottom Action Button
               Positioned(
                 bottom: 0,
                 left: 0,
@@ -401,8 +395,8 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
                                         const SizedBox(width: 12),
                                         Text(
                                           isEnrolled
-                                              ? 'VÀO HỌC NGAY'
-                                              : 'ĐĂNG KÝ NGAY',
+                                              ? "VÀO HỌC NGAY"
+                                              : "ĐĂNG KÝ NGAY",
                                           style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w900,
@@ -421,7 +415,7 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
         },
         loading: () => const LoadingStateView(),
         error: (error, _) =>
-            ErrorStateView(message: 'Không thể tải khóa học: $error'),
+            ErrorStateView(message: "Không thể tải khóa học: $error"),
       ),
     );
   }
@@ -433,7 +427,7 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
     final textColor = isEnrolled
         ? const Color(0xFF15803D)
         : const Color(0xFF2563EB);
-    final label = isEnrolled ? 'Đã đăng ký' : 'Chưa đăng ký';
+    final label = isEnrolled ? "Đã đăng ký" : "Chưa đăng ký";
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

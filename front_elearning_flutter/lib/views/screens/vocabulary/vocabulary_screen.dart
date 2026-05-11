@@ -83,35 +83,81 @@ class VocabularyScreen extends ConsumerWidget {
   ) {
     if (cards.isEmpty) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.check_circle_outline_rounded,
-              size: 80,
-              color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Tuyệt vời!',
-              style: GoogleFonts.outfit(
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xFF1E293B)
+                      : const Color(0xFFDCFCE7),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: (isDark ? Colors.black : const Color(0xFF22C55E))
+                          .withValues(alpha: 0.1),
+                      blurRadius: 30,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.check_circle_rounded,
+                  size: 64,
+                  color: isDark
+                      ? const Color(0xFF60A5FA)
+                      : const Color(0xFF16A34A),
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Bạn đã hoàn thành hết từ vựng cần ôn tập.',
-              style: GoogleFonts.inter(
-                color: isDark ? Colors.white70 : Colors.black54,
+              const SizedBox(height: 32),
+              Text(
+                'Tuyệt vời!',
+                style: GoogleFonts.outfit(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                ),
               ),
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: () => ref.invalidate(dueReviewCardsProvider),
-              child: const Text('Kiểm tra lại'),
-            ),
-          ],
+              const SizedBox(height: 12),
+              Text(
+                'Bạn đã hoàn thành hết từ vựng cần ôn tập cho ngày hôm nay. Hãy quay lại vào ngày mai để ôn tập tiếp nhé!',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  color: isDark ? Colors.white70 : const Color(0xFF64748B),
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 40),
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: OutlinedButton.icon(
+                  onPressed: () => context.go(RoutePaths.mainAppHome),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(
+                      color: isDark ? Colors.white24 : const Color(0xFFE2E8F0),
+                      width: 1.5,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  icon: const Icon(Icons.home_rounded),
+                  label: Text(
+                    'Quay lại trang chủ',
+                    style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w700,
+                      color: isDark ? Colors.white : const Color(0xFF475569),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }

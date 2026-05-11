@@ -57,18 +57,21 @@ class GameQuizQuestionCard extends StatelessWidget {
       );
     }
 
-    if (question.isMultiChoice || (question.isTrueFalse && question.options.length > 2)) {
+    if (question.isMultiChoice ||
+        (question.isTrueFalse && question.options.length > 2)) {
       return GameMultipleChoiceWidget(
         key: ValueKey(question.questionId),
         question: question.content,
         options: question.options
             .asMap()
             .entries
-            .map((e) => GameQuizOption(
-                  id: e.value.optionId,
-                  label: String.fromCharCode(65 + e.key), // A, B, C...
-                  text: e.value.text,
-                ))
+            .map(
+              (e) => GameQuizOption(
+                id: e.value.optionId,
+                label: String.fromCharCode(65 + e.key), // A, B, C...
+                text: e.value.text,
+              ),
+            )
             .toList(),
         selectedOptionId: answer?.singleOptionId,
         onOptionSelected: onSelectSingle,
@@ -102,33 +105,41 @@ class GameQuizQuestionCard extends StatelessWidget {
 
       // Try 1: Using isCorrect classification
       leftOptions = question.options.where((o) => o.isCorrect == true).toList();
-      rightOptions = question.options.where((o) => o.isCorrect == false).toList();
+      rightOptions = question.options
+          .where((o) => o.isCorrect == false)
+          .toList();
 
       // Try 2: If isCorrect fails, use metadataJson (standard for this backend)
       if (leftOptions.isEmpty || rightOptions.isEmpty) {
         try {
-          final metadata = question.metadataJson != null 
-              ? Map<String, dynamic>.from(jsonDecode(question.metadataJson!)) 
+          final metadata = question.metadataJson != null
+              ? Map<String, dynamic>.from(jsonDecode(question.metadataJson!))
               : <String, dynamic>{};
-          
+
           final leftTexts = List<String>.from(metadata['left'] ?? []);
           final rightTexts = List<String>.from(metadata['right'] ?? []);
 
           if (leftTexts.isNotEmpty && rightTexts.isNotEmpty) {
-            final availableOptions = List<QuizOptionModel>.from(question.options);
+            final availableOptions = List<QuizOptionModel>.from(
+              question.options,
+            );
             leftOptions = [];
             rightOptions = [];
 
             for (var text in leftTexts) {
               final cleanText = text.trim().toLowerCase();
-              final idx = availableOptions.indexWhere((o) => o.text.trim().toLowerCase() == cleanText);
+              final idx = availableOptions.indexWhere(
+                (o) => o.text.trim().toLowerCase() == cleanText,
+              );
               if (idx != -1) {
                 leftOptions.add(availableOptions.removeAt(idx));
               }
             }
             for (var text in rightTexts) {
               final cleanText = text.trim().toLowerCase();
-              final idx = availableOptions.indexWhere((o) => o.text.trim().toLowerCase() == cleanText);
+              final idx = availableOptions.indexWhere(
+                (o) => o.text.trim().toLowerCase() == cleanText,
+              );
               if (idx != -1) {
                 rightOptions.add(availableOptions.removeAt(idx));
               }
@@ -144,7 +155,11 @@ class GameQuizQuestionCard extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.error_outline, color: GameQuizColors.incorrect, size: 48),
+              Icon(
+                Icons.error_outline,
+                color: GameQuizColors.incorrect,
+                size: 48,
+              ),
               const SizedBox(height: 16),
               Text(
                 "Dữ liệu câu hỏi nối thẻ không hợp lệ.\n(Kiểm tra metadataJson hoặc thuộc tính isCorrect)",
@@ -159,17 +174,24 @@ class GameQuizQuestionCard extends StatelessWidget {
       return GameMatchingWidget(
         key: ValueKey(question.questionId),
         leftItems: leftOptions
-            .map((o) => MatchingItem(id: o.optionId, text: o.text, isLeft: true))
+            .map(
+              (o) => MatchingItem(id: o.optionId, text: o.text, isLeft: true),
+            )
             .toList(),
         rightItems: rightOptions
-            .map((o) => MatchingItem(id: o.optionId, text: o.text, isLeft: false))
+            .map(
+              (o) => MatchingItem(id: o.optionId, text: o.text, isLeft: false),
+            )
             .toList(),
         matchedIds: {
           ...(answer?.matchingPairs.keys ?? []),
           ...(answer?.matchingPairs.values ?? []),
         },
+        matchingPairs: answer?.matchingPairs ?? {},
         onUnmatch: (id) {
-          final newPairs = Map<String, String>.from(answer?.matchingPairs ?? {});
+          final newPairs = Map<String, String>.from(
+            answer?.matchingPairs ?? {},
+          );
           // If it's a left ID (key), remove the entry
           if (newPairs.containsKey(id)) {
             newPairs.remove(id);
@@ -180,11 +202,13 @@ class GameQuizQuestionCard extends StatelessWidget {
           onSetMatching(newPairs);
         },
         onMatchAttempt: (left, right) {
-          final newPairs = Map<String, String>.from(answer?.matchingPairs ?? {});
-          
+          final newPairs = Map<String, String>.from(
+            answer?.matchingPairs ?? {},
+          );
+
           // Enforce 1-1 matching: if this right side was already matched, remove the old left side
           newPairs.removeWhere((k, v) => v == right);
-          
+
           newPairs[left] = right;
           onSetMatching(newPairs);
         },

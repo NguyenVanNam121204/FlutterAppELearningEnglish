@@ -163,7 +163,7 @@ class _FlashCardReviewSessionState
                 ),
                 const SizedBox(height: 32),
                 Text(
-                  'Hoàn thành mục tiêu!',
+                  'Tuyệt vời!',
                   style: GoogleFonts.outfit(
                     fontSize: 24,
                     fontWeight: FontWeight.w900,
@@ -172,7 +172,7 @@ class _FlashCardReviewSessionState
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Bạn đã hoàn thành tất cả các từ cần ôn tập cho hôm nay rồi. Tuyệt vời quá!',
+                  'Bạn đã hoàn thành hết từ vựng cần ôn tập cho ngày hôm nay. Hãy quay lại vào ngày mai để ôn tập tiếp nhé!',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 15,
@@ -262,13 +262,18 @@ class _FlashCardReviewSessionState
                   letterSpacing: -1,
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Bạn đã hoàn thành phiên ôn tập',
-                style: GoogleFonts.inter(
-                  fontSize: 16,
-                  color: const Color(0xFF64748B),
-                  fontWeight: FontWeight.w500,
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Text(
+                  'Bạn đã hoàn thành phiên ôn tập từ vựng của ngày hôm nay. Hãy quay lại vào ngày mai để tiếp tục lộ trình nhé!',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    color: const Color(0xFF64748B),
+                    fontWeight: FontWeight.w500,
+                    height: 1.5,
+                  ),
                 ),
               ),
               const SizedBox(height: 48),
