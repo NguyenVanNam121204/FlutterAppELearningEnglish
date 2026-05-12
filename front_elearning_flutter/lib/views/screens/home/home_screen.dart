@@ -160,23 +160,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             SliverToBoxAdapter(
               child: CatalunyaReveal(
                 delay: const Duration(milliseconds: 100),
-                child: HomeHeaderCard(displayName: displayName),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: HomeHeaderCard(displayName: displayName),
+                ),
               ),
             ),
             SliverToBoxAdapter(
               child: CatalunyaReveal(
                 delay: const Duration(milliseconds: 200),
-                child: StreakSection(streak: homeState.streak),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  child: StreakSection(streak: homeState.streak),
+                ),
               ),
             ),
             SliverToBoxAdapter(
               child: CatalunyaReveal(
                 delay: const Duration(milliseconds: 300),
-                child: SuggestedCoursesSection(
-                  courses: homeState.suggestedCourses,
-                  isLoading: homeState.isLoading,
-                  onEnrollCourse: _enrollCourse,
-                  onOpenCourse: _openCourse,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: SuggestedCoursesSection(
+                    courses: homeState.suggestedCourses,
+                    isLoading: homeState.isLoading,
+                    onEnrollCourse: _enrollCourse,
+                    onOpenCourse: _openCourse,
+                  ),
                 ),
               ),
             ),
