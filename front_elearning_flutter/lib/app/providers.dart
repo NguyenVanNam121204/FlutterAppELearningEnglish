@@ -434,7 +434,7 @@ final flashcardLearningViewModelProvider =
     });
 
 final flashcardReviewSessionViewModelProvider =
-    StateNotifierProvider<
+    StateNotifierProvider.autoDispose<
       FlashcardReviewSessionViewModel,
       FlashcardReviewSessionState
     >((ref) {
