@@ -82,19 +82,30 @@ Chạy web:
 flutter run -d chrome
 ```
 
-## Chất lượng code
+## Chất lượng code & Kiểm thử tự động
 
-Phân tích static:
-
+### 1. Phân tích static
+Đảm bảo mã nguồn tuân thủ các quy tắc chuẩn hóa và không có lỗi cú pháp:
 ```bash
 flutter analyze
 ```
 
-Chạy test:
-
+### 2. Chạy Unit & Widget Test
+Kiểm thử các đơn vị logic nghiệp vụ và giao diện cô lập:
 ```bash
 flutter test
 ```
+
+### 3. Kiểm thử tự động hóa đầu-cuối E2E (End-to-End Testing) 🚀
+Dự án được trang bị hệ thống kiểm thử tự động toàn diện tích hợp, giả lập 100% hành trình khép kín của học viên bao gồm: **Đăng nhập -> Học Flashcard (Nghe loa & Lật thẻ) -> Giải Quiz 13 câu (Tương tác cả 6 loại Game trắc nghiệm) -> Xem kết quả & Chi tiết bài làm -> Ôn tập từ vựng**.
+
+Để chạy kịch bản E2E tự động hóa trên máy ảo Android, bạn thực thi lệnh:
+```bash
+flutter test integration_test/app_test.dart
+```
+
+> [!TIP]
+> Bạn có thể xem chi tiết sơ đồ kịch bản học tập, cấu trúc kỹ thuật và hướng dẫn xử lý sự cố máy ảo tại tài liệu chuyên sâu: [e2e_testing_guide.md](e2e_testing_guide.md).
 
 ## Quy ước phát triển
 

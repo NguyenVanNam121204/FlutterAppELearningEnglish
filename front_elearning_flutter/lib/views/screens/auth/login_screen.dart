@@ -57,6 +57,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               const SizedBox(height: 14),
             ],
             AuthTextField(
+              key: const ValueKey('email-field'),
               controller: _emailController,
               label: 'Email',
               hint: 'example@gmail.com',
@@ -76,6 +77,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
             const SizedBox(height: 14),
             AuthTextField(
+              key: const ValueKey('password-field'),
               controller: _passwordController,
               label: 'Mật khẩu',
               hint: 'Nhập mật khẩu của bạn',
@@ -98,6 +100,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
             ),
             AuthPrimaryButton(
+              key: const ValueKey('login-button'),
               label: 'Đăng nhập',
               isLoading: authState.isLoading,
               onPressed: _submit,
