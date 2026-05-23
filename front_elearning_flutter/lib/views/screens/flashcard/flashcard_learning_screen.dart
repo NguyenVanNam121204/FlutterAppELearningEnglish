@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../app/config/app_config.dart';
 import '../../../app/providers.dart';
@@ -1218,10 +1219,13 @@ class _CardImage extends StatelessWidget {
                   color: isBack ? Colors.white70 : const Color(0xFF9CA3AF),
                 ),
               )
-            : Image.network(
-                resolvedUrl,
+            : CachedNetworkImage(
+                imageUrl: resolvedUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => Center(
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(color: Color(0xFF0EA5E9)),
+                ),
+                errorWidget: (context, url, error) => Center(
                   child: Icon(
                     Icons.broken_image_outlined,
                     size: 48,

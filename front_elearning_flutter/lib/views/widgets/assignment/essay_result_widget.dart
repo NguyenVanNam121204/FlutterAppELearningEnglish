@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../models/assignment/assignment_models.dart';
 import '../common/catalunya_card.dart';
 
@@ -137,9 +138,13 @@ class EssayResultWidget extends StatelessWidget {
                 const SizedBox(height: 12),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    imageUrl!,
+                  child: CachedNetworkImage(
+                    imageUrl: imageUrl!,
                     fit: BoxFit.cover,
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                    errorWidget: (context, url, error) => const Icon(Icons.broken_image),
                   ),
                 ),
               ],

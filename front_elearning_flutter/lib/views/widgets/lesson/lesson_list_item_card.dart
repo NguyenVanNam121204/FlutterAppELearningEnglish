@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../models/learning/lesson_models.dart';
 import '../common/catalunya_card.dart';
@@ -42,10 +43,16 @@ class LessonListItemCard extends StatelessWidget {
                   child: hasImage
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(12),
-                          child: Image.network(
-                            item.imageUrl!,
+                          child: CachedNetworkImage(
+                            imageUrl: item.imageUrl!,
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
+                            placeholder: (context, url) => const Center(
+                              child: SizedBox(
+                                width: 24, height: 24,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) {
                               return _LessonIndexBadge(order: displayOrder);
                             },
                           ),

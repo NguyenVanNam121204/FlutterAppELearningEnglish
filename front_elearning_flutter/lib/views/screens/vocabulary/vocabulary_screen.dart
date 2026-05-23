@@ -1,6 +1,7 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
 import '../../../app/providers.dart';
 import '../../../app/router/route_paths.dart';
@@ -334,12 +335,15 @@ class _ReviewWordCard extends StatelessWidget {
               if (card.imageUrl.isNotEmpty) ...[
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    card.imageUrl,
+                  child: CachedNetworkImage(
+                    imageUrl: card.imageUrl,
                     width: 54,
                     height: 54,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    errorWidget: (context, url, error) =>
                         _buildIndexBadge(index, badgeFg, isDark),
                   ),
                 ),

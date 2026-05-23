@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'app/app.dart';
 import 'app/theme/theme_provider.dart';
@@ -23,6 +24,11 @@ Future<void> main() async {
   HttpOverrides.global = MyHttpOverrides();
   GoRouter.optionURLReflectsImperativeAPIs = true;
   await dotenv.load(fileName: '.env');
+
+  if (Platform.isWindows || Platform.isLinux) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
 
   final prefs = await SharedPreferences.getInstance();
 

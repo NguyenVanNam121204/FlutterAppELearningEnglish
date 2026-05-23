@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../models/my_course/my_course_models.dart';
 
@@ -71,9 +72,16 @@ class MyCourseListItem extends StatelessWidget {
                                     item.imageUrl!.isNotEmpty
                                 ? ClipRRect(
                                     borderRadius: BorderRadius.circular(16),
-                                    child: Image.network(
-                                      item.imageUrl!,
+                                    child: CachedNetworkImage(
+                                      imageUrl: item.imageUrl!,
                                       fit: BoxFit.cover,
+                                      placeholder: (context, url) => const Center(
+                                        child: SizedBox(
+                                          width: 20, height: 20,
+                                          child: CircularProgressIndicator(strokeWidth: 2),
+                                        ),
+                                      ),
+                                      errorWidget: (context, url, error) => const Icon(Icons.broken_image),
                                     ),
                                   )
                                 : const Icon(

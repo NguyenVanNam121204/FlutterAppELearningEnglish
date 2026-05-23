@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -1052,10 +1053,13 @@ class _ReviewCardImage extends StatelessWidget {
                   color: Color(0xFF94A3B8),
                 ),
               )
-            : Image.network(
-                resolvedUrl,
+            : CachedNetworkImage(
+                imageUrl: resolvedUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => const Center(
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(color: Color(0xFF0EA5E9)),
+                ),
+                errorWidget: (context, url, error) => const Center(
                   child: Icon(
                     Icons.broken_image_outlined,
                     size: 38,

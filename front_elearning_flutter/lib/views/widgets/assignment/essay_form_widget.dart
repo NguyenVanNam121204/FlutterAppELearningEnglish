@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class EssayFormWidget extends StatefulWidget {
   const EssayFormWidget({
@@ -180,10 +181,14 @@ class _InstructionCard extends StatelessWidget {
                     const SizedBox(height: 16),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
-                        imageUrl!,
+                      child: CachedNetworkImage(
+                        imageUrl: imageUrl!,
                         width: double.infinity,
                         fit: BoxFit.cover,
+                        placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                        errorWidget: (context, url, error) => const Icon(Icons.broken_image),
                       ),
                     ),
                   ],

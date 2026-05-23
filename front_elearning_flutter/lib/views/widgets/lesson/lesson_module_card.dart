@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../models/learning/lesson_models.dart';
 import '../common/catalunya_card.dart';
@@ -55,10 +56,16 @@ class LessonModuleCard extends StatelessWidget {
                 height: 52,
                 color: const Color(0xFFE8F2FF),
                 child: (module.imageUrl ?? '').trim().isNotEmpty
-                    ? Image.network(
-                        module.imageUrl!,
+                    ? CachedNetworkImage(
+                        imageUrl: module.imageUrl!,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
+                        placeholder: (context, url) => const Center(
+                          child: SizedBox(
+                            width: 24, height: 24,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) {
                           return Icon(_fallbackIcon, size: 24);
                         },
                       )
