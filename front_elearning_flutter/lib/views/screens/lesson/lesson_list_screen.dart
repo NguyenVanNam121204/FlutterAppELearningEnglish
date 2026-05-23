@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -41,12 +41,17 @@ class _LessonListScreenState extends ConsumerState<LessonListScreen> {
               return LessonListItemCard(
                 item: item,
                 displayOrder: index + 1,
-                onTap: () => context.push(
-                  RoutePaths.courseLessonDetail(
-                    courseId: widget.courseId,
-                    lessonId: item.lessonId,
-                  ),
-                ),
+                onTap: () async {
+                  await context.push(
+                    RoutePaths.courseLessonDetail(
+                      courseId: widget.courseId,
+                      lessonId: item.lessonId,
+                    ),
+                  );
+                  if (context.mounted) {
+                    ref.invalidate(lessonsByCourseProvider(widget.courseId));
+                  }
+                },
               );
             },
           );

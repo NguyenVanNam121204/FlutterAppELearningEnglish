@@ -1,4 +1,4 @@
-﻿import "package:flutter/material.dart";
+import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:go_router/go_router.dart";
 import "dart:async";
@@ -59,12 +59,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 
-  void _openCourse(HomeCourseModel course) {
-    context.push(RoutePaths.courseInCourses(course.courseId.toString()));
+  Future<void> _openCourse(HomeCourseModel course) async {
+    await context.push(RoutePaths.courseInCourses(course.courseId.toString()));
+    if (mounted) {
+      ref.read(homeViewModelProvider.notifier).loadHomeData();
+    }
   }
 
   Future<void> _enrollCourse(HomeCourseModel course) async {
-    context.push("${RoutePaths.courseDetail}?courseId=${course.courseId}");
+    await context.push("${RoutePaths.courseDetail}?courseId=${course.courseId}");
+    if (mounted) {
+      ref.read(homeViewModelProvider.notifier).loadHomeData();
+    }
   }
 
   @override

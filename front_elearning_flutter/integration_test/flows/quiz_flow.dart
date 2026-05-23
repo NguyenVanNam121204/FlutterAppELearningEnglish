@@ -12,11 +12,11 @@ import 'package:front_elearning_flutter/views/widgets/quiz/game/game_ordering_wi
 // BƯỚC 4: LUỒNG LÀM QUIZ (QUIZ FLOW)
 // ============================================================
 // State-based approach:
-//   ✅ Chờ nút bắt đầu (1 trong 3 loại) xuất hiện → chọn đúng loại
-//   ✅ Sau khi trả lời: chờ nút TIẾP THEO / NỘP BÀI xuất hiện
+//   Chờ nút bắt đầu (1 trong 3 loại) xuất hiện → chọn đúng loại
+//   Sau khi trả lời: chờ nút TIẾP THEO / NỘP BÀI xuất hiện
 //      (= câu đã được chấm điểm và sẵn sàng cho bước tiếp theo)
-//   ✅ Sau khi nộp bài: chờ trang kết quả xuất hiện (nút HOÀN THÀNH)
-//   ✅ Sau khi xem chi tiết: chờ quay lại kết quả (nút HOÀN THÀNH lại)
+//   Sau khi nộp bài: chờ trang kết quả xuất hiện (nút HOÀN THÀNH)
+//   Sau khi xem chi tiết: chờ quay lại kết quả (nút HOÀN THÀNH lại)
 // ============================================================
 
 /// Luồng hoàn chỉnh: Điều hướng đến Quiz → Giải tự động → Xem kết quả.
@@ -91,7 +91,7 @@ Future<void> _navigateToQuiz(WidgetTester tester) async {
     timeout: const Duration(seconds: 15),
     reason: 'Câu hỏi đầu tiên không tải được',
   );
-  debugPrint('--- ✅ ĐÃ TẢI XONG ĐỀ THI ---');
+  debugPrint('--- ĐÃ TẢI XONG ĐỀ THI ---');
 }
 
 // ──────────────────────────────────────────────
@@ -170,7 +170,7 @@ Future<void> _submitQuiz(WidgetTester tester) async {
     timeout: const Duration(seconds: 20),
     reason: 'Trang kết quả không tải được sau khi nộp bài',
   );
-  debugPrint('--- ✅ ĐÃ NỘP BÀI THÀNH CÔNG ---');
+  debugPrint('--- ĐÃ NỘP BÀI THÀNH CÔNG ---');
 }
 
 // ──────────────────────────────────────────────
@@ -234,7 +234,7 @@ Future<void> _handleQuizResult(WidgetTester tester) async {
     await tester.pumpAndSettle(const Duration(milliseconds: 300));
   }
 
-  debugPrint('--- ✅ HOÀN THÀNH PHIÊN LÀM QUIZ ---');
+  debugPrint('--- HOÀN THÀNH PHIÊN LÀM QUIZ ---');
 }
 
 /// Vào trang chi tiết bài làm rồi quay lại trang kết quả.

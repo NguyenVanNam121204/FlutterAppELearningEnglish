@@ -35,42 +35,56 @@ Future<void> cleanupTestUserProgress() async {
   try {
     // Tắt kiểm tra SSL certificate (Backend local dùng http)
     final httpClient = HttpClient()
+      ..connectionTimeout = const Duration(seconds: 5)
       ..badCertificateCallback = (cert, host, port) => true;
 
     // Bước 1: Lấy userId của tài khoản test qua API check-env
     final checkUri =
         Uri.parse('$testApiBase/api/test/check-env?email=$testUserEmail');
-    final checkRequest = await httpClient.getUrl(checkUri);
-    final checkResponse = await checkRequest.close();
+    final checkRequest = await httpClient.getUrl(checkUri).timeout(const Duration(seconds: 5));
+    final checkResponse = await checkRequest.close().timeout(const Duration(seconds: 5));
     final checkBody =
-        await checkResponse.transform(const Utf8Decoder()).join();
+        await checkResponse.transform(const Utf8Decoder()).join().timeout(const Duration(seconds: 5));
     final checkJson = jsonDecode(checkBody) as Map<String, dynamic>;
+
+    if (checkResponse.statusCode == 403) {
+      final msg = 'LỖI: ${checkJson['message'] ?? 'Forbidden'}';
+      debugPrint('[PRE-TEST] $msg');
+      throw Exception(msg);
+    }
+
+    final env = checkJson['environment'] as String?;
+    if (env != 'E2E') {
+      final msg = 'LỖI: Backend đang chạy ở môi trường "$env" thay vì "E2E"';
+      debugPrint('[PRE-TEST] $msg');
+      throw Exception(msg);
+    }
 
     final testUser = checkJson['testUser'];
     if (testUser == null) {
       debugPrint(
-        '[PRE-TEST] ⚠️ Không tìm thấy tài khoản test "$testUserEmail". Bỏ qua cleanup.',
+        '[PRE-TEST] Không tìm thấy tài khoản test "$testUserEmail". Bỏ qua cleanup.',
       );
       return;
     }
 
     final int userId = testUser['userId'] as int;
     debugPrint(
-        '[PRE-TEST] ✅ Tìm thấy tài khoản test (userId=$userId). Đang dọn dẹp...');
+        '[PRE-TEST] Tìm thấy tài khoản test (userId=$userId). Đang dọn dẹp...');
 
     // Bước 2: Gọi API dọn dẹp toàn bộ dữ liệu tiến độ học tập
     final cleanupUri = Uri.parse(
         '$testApiBase/api/test/cleanup-user-progress?userId=$userId');
-    final cleanupRequest = await httpClient.postUrl(cleanupUri);
+    final cleanupRequest = await httpClient.postUrl(cleanupUri).timeout(const Duration(seconds: 5));
     cleanupRequest.headers.set('Content-Type', 'application/json');
-    final cleanupResponse = await cleanupRequest.close();
+    final cleanupResponse = await cleanupRequest.close().timeout(const Duration(seconds: 5));
     final cleanupBody =
-        await cleanupResponse.transform(const Utf8Decoder()).join();
+        await cleanupResponse.transform(const Utf8Decoder()).join().timeout(const Duration(seconds: 5));
     final cleanupJson = jsonDecode(cleanupBody) as Map<String, dynamic>;
 
     if (cleanupResponse.statusCode == 200 && cleanupJson['success'] == true) {
       final summary = cleanupJson['summary'] as Map<String, dynamic>;
-      debugPrint('[PRE-TEST] ✅ Dọn dẹp thành công!');
+      debugPrint('[PRE-TEST] Dọn dẹp thành công!');
       debugPrint(
           '[PRE-TEST]   - QuizAttempts đã xóa: ${summary['quizAttemptsDeleted']}');
       debugPrint(
@@ -85,16 +99,19 @@ Future<void> cleanupTestUserProgress() async {
           '[PRE-TEST]   - Streaks đã xóa: ${summary['streaksDeleted']}');
     } else {
       debugPrint(
-          '[PRE-TEST] ⚠️ Cleanup API trả về: ${cleanupResponse.statusCode} - $cleanupBody');
+          '[PRE-TEST] Cleanup API trả về: ${cleanupResponse.statusCode} - $cleanupBody');
     }
 
     httpClient.close();
-  } catch (e) {
-    // Không fail test nếu cleanup lỗi (backend chưa khởi động...)
-    // Test sẽ tiếp tục chạy, chỉ cảnh báo để người dùng biết
-    debugPrint('[PRE-TEST] ⚠️ Không thể kết nối API cleanup: $e');
+  } on SocketException catch (e) {
+    debugPrint('[PRE-TEST] Không thể kết nối API cleanup (Backend chưa chạy): $e');
     debugPrint('[PRE-TEST]    Hãy đảm bảo backend đang chạy tại $testApiBase');
     debugPrint('[PRE-TEST]    Test sẽ tiếp tục chạy với dữ liệu hiện tại...');
+  } catch (e) {
+    if (e.toString().contains('LỖI NGHIÊM TRỌNG')) {
+      rethrow;
+    }
+    debugPrint('[PRE-TEST] Lỗi dọn dẹp dữ liệu khác: $e');
   }
 
   debugPrint('=== [PRE-TEST] Hoàn tất giai đoạn chuẩn bị môi trường ===');

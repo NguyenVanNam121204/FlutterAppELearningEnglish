@@ -5,9 +5,9 @@ import '../helpers/test_helpers.dart';
 // BƯỚC 1: LUỒNG ĐĂNG NHẬP (AUTH FLOW)
 // ============================================================
 // State-based approach:
-//   ✅ Chờ form login HOẶC màn home xuất hiện → biết app đã sẵn sàng
-//   ✅ Sau khi tap Login: chờ loading biến mất thay vì delay 5s
-//   ✅ Xác nhận login thành công: chờ thanh BottomNav xuất hiện
+//   Chờ form login HOẶC màn home xuất hiện → biết app đã sẵn sàng
+//   Sau khi tap Login: chờ loading biến mất thay vì delay 5s
+//   Xác nhận login thành công: chờ thanh BottomNav xuất hiện
 // ============================================================
 
 /// Kiểm tra trạng thái và thực hiện đăng nhập nếu cần.
@@ -39,7 +39,7 @@ Future<void> runAuthFlow(WidgetTester tester) async {
   // Tự động đứng chờ API và Ảnh trên màn hình Home (nếu có) tải xong hoàn toàn
   await waitForLoading(tester, timeout: const Duration(seconds: 15));
   
-  debugPrint('--- ✅ ĐÃ VÀO MÀN HÌNH HOME VÀ TẢI XONG ẢNH ---');
+  debugPrint('--- ĐÃ VÀO MÀN HÌNH HOME VÀ TẢI XONG ẢNH ---');
   logFlowPass('Auth Flow');
 }
 

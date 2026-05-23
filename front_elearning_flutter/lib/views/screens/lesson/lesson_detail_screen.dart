@@ -139,10 +139,13 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen> {
                       contentTypeName: normalizedTypeName,
                     );
                   },
-                  onPronunciationTap: () {
-                    context.push(
+                  onPronunciationTap: () async {
+                    await context.push(
                       '${RoutePaths.pronunciation}?moduleId=$moduleId',
                     );
+                    if (context.mounted) {
+                      ref.invalidate(lessonDetailBundleProvider(widget.lessonId));
+                    }
                   },
                 );
               }),

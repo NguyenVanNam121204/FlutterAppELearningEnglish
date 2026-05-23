@@ -78,8 +78,12 @@ class _MyCourseScreenState extends ConsumerState<MyCourseScreen> {
                   child: MyCourseListItem(
                     item: c,
                     index: index,
-                    onTap: () =>
-                        context.push(RoutePaths.courseInCourses(c.courseId)),
+                    onTap: () async {
+                      await context.push(RoutePaths.courseInCourses(c.courseId));
+                      if (context.mounted) {
+                        ref.read(myCourseViewModelProvider.notifier).loadMyCourses();
+                      }
+                    },
                   ),
                 );
               },

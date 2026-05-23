@@ -9,11 +9,11 @@ import 'package:front_elearning_flutter/views/widgets/flashcard/flashcard_audio_
 // BƯỚC 2 + 3: LUỒNG CHỌN KHÓA HỌC & HỌC FLASHCARD
 // ============================================================
 // State-based approach:
-//   ✅ Sau khi tap tab Khóa học: chờ loading biến mất
-//   ✅ Sau khi tap khóa học: chờ nút "VÀO HỌC NGAY" xuất hiện
-//   ✅ Sau khi tap bài học: chờ mục "Flashcard" xuất hiện
-//   ✅ Trong vòng lặp học thẻ: chờ thẻ tiếp theo render (key xuất hiện)
-//   ✅ Kết thúc: chờ màn hình trước (Chi tiết bài học) quay lại
+//   Sau khi tap tab Khóa học: chờ loading biến mất
+//   Sau khi tap khóa học: chờ nút "VÀO HỌC NGAY" xuất hiện
+//   Sau khi tap bài học: chờ mục "Flashcard" xuất hiện
+//   Trong vòng lặp học thẻ: chờ thẻ tiếp theo render (key xuất hiện)
+//   Kết thúc: chờ màn hình trước (Chi tiết bài học) quay lại
 // ============================================================
 
 /// Điều hướng đến khóa học, chọn bài học và học toàn bộ Flashcard.
@@ -58,7 +58,7 @@ Future<void> _navigateToCourse(WidgetTester tester) async {
     timeout: const Duration(seconds: 12),
     reason: 'Nút "VÀO HỌC NGAY" không xuất hiện sau khi vào Chi tiết khóa học',
   );
-  debugPrint('--- ✅ ĐÃ VÀO CHI TIẾT KHÓA HỌC ---');
+  debugPrint('--- ĐÃ VÀO CHI TIẾT KHÓA HỌC ---');
 
   // Tap → Xác nhận: LessonListItemCard xuất hiện = Danh sách bài học đã render
   await tapAndWaitFor(
@@ -68,7 +68,7 @@ Future<void> _navigateToCourse(WidgetTester tester) async {
     timeout: const Duration(seconds: 15),
     reason: 'Danh sách bài học không xuất hiện sau khi nhấn "VÀO HỌC NGAY"',
   );
-  debugPrint('--- ✅ ĐÃ VÀO DANH SÁCH BÀI HỌC ---');
+  debugPrint('--- ĐÃ VÀO DANH SÁCH BÀI HỌC ---');
 }
 
 // ──────────────────────────────────────────────
@@ -95,7 +95,7 @@ Future<void> _navigateToLesson(WidgetTester tester) async {
     timeout: const Duration(seconds: 12),
     reason: 'Mục "Flashcard" không xuất hiện trong Chi tiết bài học',
   );
-  debugPrint('--- ✅ ĐÃ VÀO CHI TIẾT BÀI HỌC ---');
+  debugPrint('--- ĐÃ VÀO CHI TIẾT BÀI HỌC ---');
 
   // Tap → Xác nhận: Nút "Tiếp theo" xuất hiện = thẻ Flashcard đầu tiên đã sẵn sàng
   await tapAndWaitFor(
@@ -105,7 +105,7 @@ Future<void> _navigateToLesson(WidgetTester tester) async {
     timeout: const Duration(seconds: 12),
     reason: 'Màn hình Flashcard không tải được (không thấy nút "Tiếp theo")',
   );
-  debugPrint('--- ✅ ĐÃ VÀO MÀN HÌNH FLASHCARD ---');
+  debugPrint('--- ĐÃ VÀO MÀN HÌNH FLASHCARD ---');
 }
 
 // ──────────────────────────────────────────────
@@ -120,7 +120,7 @@ Future<void> _learnAllFlashcards(WidgetTester tester) async {
 
   while (!tester.any(finishBtn)) {
     if (cardIndex > 50) {
-      debugPrint('--- ⚠️ CẢNH BÁO: Đã học 50 thẻ, thoát vòng lặp an toàn ---');
+      debugPrint('--- CẢNH BÁO: Đã học 50 thẻ, thoát vòng lặp an toàn ---');
       break;
     }
 
@@ -168,7 +168,7 @@ Future<void> _learnAllFlashcards(WidgetTester tester) async {
         );
       } catch (e) {
         // Nếu loa không thể khởi động (có thể do lỗi mạng tải file audio), ta bỏ qua để test không bị đứng
-        debugPrint('--- ⚠️ Loa không phản hồi hoặc không có file audio, bỏ qua chờ âm thanh ---');
+        debugPrint('--- Loa không phản hồi hoặc không có file audio, bỏ qua chờ âm thanh ---');
       }
 
       await tester.tap(cardFinder); // Lật lại mặt trước
@@ -215,12 +215,12 @@ Future<void> _learnAllFlashcards(WidgetTester tester) async {
     await _fallbackCloseFlashcard(tester);
   }
 
-  debugPrint('--- ✅ HOÀN THÀNH PHIÊN HỌC FLASHCARD ---');
+  debugPrint('--- HOÀN THÀNH PHIÊN HỌC FLASHCARD ---');
 }
 
 /// Đóng màn hình Flashcard theo phương án dự phòng nếu không tìm thấy nút "Hoàn thành".
 Future<void> _fallbackCloseFlashcard(WidgetTester tester) async {
-  debugPrint('--- ⚠️ KHÔNG TÌM THẤY NÚT HOÀN THÀNH → ĐÓNG BẰNG NÚT X ---');
+  debugPrint('--- KHÔNG TÌM THẤY NÚT HOÀN THÀNH → ĐÓNG BẰNG NÚT X ---');
 
   final closeRounded = find.byIcon(Icons.close_rounded);
   final closeRegular = find.byIcon(Icons.close);

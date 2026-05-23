@@ -101,9 +101,9 @@ Future<void> waitForLoading(
 // ============================================================
 // Khác biệt quan trọng với blind delay:
 //
-//   ❌ Blind delay:   tap → delay(5s) → action    (chờ mù quáng)
-//   ✅ State-based:  tap → waitFor → action       (chờ đúng nhưng quá nhanh)
-//   ✨ State + pace: tap → waitFor → pause → action (chờ đúng + mắt người kịp thấy)
+//    Blind delay:   tap → delay(5s) → action    (chờ mù quáng)
+//    State-based:  tap → waitFor → action       (chờ đúng nhưng quá nhanh)
+//    State + pace: tap → waitFor → pause → action (chờ đúng + mắt người kịp thấy)
 //
 // _visualPause chạy SAU KHI state đã được xác nhận, không phải trước.
 // Dùng Future.delayed (thời gian thực) để đảm bảo pause thực sự trên thiết bị.
