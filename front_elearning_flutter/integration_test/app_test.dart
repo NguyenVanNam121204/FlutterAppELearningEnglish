@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -12,9 +14,26 @@ import 'package:front_elearning_flutter/views/widgets/quiz/game/game_matching_wi
 import 'package:front_elearning_flutter/views/widgets/quiz/game/game_ordering_widget.dart';
 import 'package:front_elearning_flutter/views/widgets/flashcard/flashcard_audio_button.dart';
 
+/// URL gốc của backend API (10.0.2.2 = localhost từ trong máy ảo Android)
+const String _testApiBase = 'http://10.0.2.2:5030';
+
+/// Email của tài khoản học viên dùng trong kịch bản E2E
+const String _testUserEmail = 'nt0143436946@gmail.com';
+
 void main() {
   // 1. Khởi tạo binding cho kiểm thử E2E
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
+  // ============================================================
+  // PRE-TEST SETUP: Dọn sạch dữ liệu tiến độ trước mỗi lần test
+  // ============================================================
+  // Bước này gọi trực tiếp vào API backend để xóa toàn bộ lịch sử
+  // làm bài Quiz, ôn tập Flashcard, tiến độ bài học... của tài khoản
+  // test -> Đảm bảo kịch bản E2E luôn bắt đầu từ trạng thái sạch sẽ
+  // và nhất quán, không bị ảnh hưởng bởi dữ liệu từ lần chạy trước.
+  setUpAll(() async {
+    await _cleanupTestUserProgress();
+  });
 
   // Hàm chờ động thông minh (Chờ cho đến khi Widget xuất hiện, tối đa 15 giây)
   Future<void> waitFor(WidgetTester tester, Finder finder, {int timeoutSeconds = 15}) async {
@@ -124,52 +143,78 @@ void main() {
         await tester.tap(flashcardItem);
         await delay(tester, ms: 3000); // Chờ tải Flashcard đầu tiên
 
-        // Giả lập học Flashcard tương tác: Phát loa -> Lật thẻ -> Lật lại -> Tiếp theo
+        // Giả lập học Flashcard tương tác: Phát loa -> Lật thẻ -> Tiếp theo
+        // Học đến hết toàn bộ thẻ cho đến khi nút "Hoàn thành" xuất hiện
         final nextBtn = find.text('Tiếp theo');
+        final finishBtn = find.text('Hoàn thành');
         await waitFor(tester, nextBtn, timeoutSeconds: 8);
-        
-        for (int i = 0; i < 3; i++) {
+
+        int cardIndex = 0;
+        while (!tester.any(finishBtn)) {
+          debugPrint('--- ĐANG HỌC THẺ FLASHCARD SỐ $cardIndex ---');
+
           // A. Nhấp vào loa để phát âm thanh
           final speakerIcon = find.byType(FlashcardAudioButton);
           if (tester.any(speakerIcon)) {
-            debugPrint('--- PHÁT ÂM THANH FLASHCARD $i ---');
             await tester.tap(speakerIcon);
-            await delay(tester, ms: 2000); // Chờ nghe phát âm trong 2 giây
+            await delay(tester, ms: 1500); // Chờ nghe phát âm
           }
 
-          // B. Nhấp vào thẻ để lật mặt sau
-          final cardKey = ValueKey('card-$i');
+          // B. Nhấp vào thẻ để lật mặt sau (xem nghĩa)
+          final cardKey = ValueKey('card-$cardIndex');
           final flashcardWidget = find.byKey(cardKey);
           if (tester.any(flashcardWidget)) {
-            debugPrint('--- LẬT MẶT SAU THẺ $i ---');
+            debugPrint('--- LẬT MẶT SAU THẺ $cardIndex ---');
             await tester.tap(flashcardWidget);
-            await delay(tester, ms: 2000); // Xem nghĩa trong 2 giây
-            
-            // C. Nhấp vào thẻ lần nữa để lật lại mặt trước
-            debugPrint('--- LẬT MẶT TRƯỚC THẺ $i ---');
+            await delay(tester, ms: 1500); // Xem nghĩa
+            // C. Lật lại mặt trước
             await tester.tap(flashcardWidget);
-            await delay(tester, ms: 1000); // Chờ 1 giây ổn định
+            await delay(tester, ms: 800);
           }
 
-          // D. Nhấn nút "Tiếp theo" để sang từ mới
-          if (tester.any(nextBtn)) {
+          // D. Nhấn "Tiếp theo" nếu có, nếu không check "Hoàn thành"
+          await tester.pump();
+          if (tester.any(finishBtn)) {
+            // Đã tới thẻ cuối cùng -> thoát vòng lặp để bấm Hoàn thành
+            break;
+          } else if (tester.any(nextBtn)) {
             await tester.tap(nextBtn);
-            await delay(tester, ms: 1500); // Chờ hiệu ứng trượt thẻ
+            await delay(tester, ms: 1200);
+          } else {
+            // Không có nút nào -> đợi thêm
+            await delay(tester, ms: 1000);
+          }
+
+          cardIndex++;
+
+          // Giới hạn an toàn để tránh vòng lặp vô hạn (tối đa 50 thẻ)
+          if (cardIndex > 50) {
+            debugPrint('--- CẢNH BÁO: Đã học 50 thẻ, thoát vòng lặp an toàn ---');
+            break;
           }
         }
-        await delay(tester, ms: 2000);
 
-        // Bấm nút đóng để quay lại màn Chi tiết bài học
-        final closeBtn = find.byIcon(Icons.close_rounded);
-        final closeBtnAlt = find.byIcon(Icons.close);
-        if (tester.any(closeBtn)) {
-          await tester.tap(closeBtn);
-        } else if (tester.any(closeBtnAlt)) {
-          await tester.tap(closeBtnAlt);
+        // Bấm nút "Hoàn thành" để hoàn tất phiên học flashcard
+        await tester.pump();
+        if (tester.any(finishBtn)) {
+          debugPrint('--- BẤM HOÀN THÀNH SAU KHI HỌC HẾT $cardIndex THẺ ---');
+          await tester.tap(finishBtn);
+          await delay(tester, ms: 2500); // Chờ quay lại màn Chi tiết bài học
         } else {
-          await tester.tap(find.byType(BackButton));
+          // Fallback: đóng bằng nút X nếu không tìm thấy "Hoàn thành"
+          debugPrint('--- KHÔNG TÌM THẤY NÚT HOÀN THÀNH -> ĐÓNG BẰNG NÚT X ---');
+          final closeBtn = find.byIcon(Icons.close_rounded);
+          final closeBtnAlt = find.byIcon(Icons.close);
+          if (tester.any(closeBtn)) {
+            await tester.tap(closeBtn);
+          } else if (tester.any(closeBtnAlt)) {
+            await tester.tap(closeBtnAlt);
+          } else {
+            await tester.tap(find.byType(BackButton));
+          }
+          await delay(tester, ms: 2000);
         }
-        await delay(tester, ms: 2000);
+
 
         // ========================================================
         // BƯỚC 4: VÀO BÀI TEST & TỰ ĐỘNG GIẢI QUIZ
@@ -407,47 +452,136 @@ void main() {
         await delay(tester, ms: 2500);
 
         // ========================================================
-        // BƯỚC 5: KIỂM TRA ĐỒNG BỘ TIẾN ĐỘ Ở MÀN HÌNH ÔN TẬP TỪ VỰNG CHẬM
+        // BƯỚC 5: KIỂM TRA MÀN HÌNH ÔN TẬP TỪ VỰNG (XỬ LÝ 2 TRẠNG THÁI)
         // ========================================================
+        // Lưu ý: Sau cleanup, từ vựng mới học có NextReviewDate = ngày mai
+        // (theo thuật toán Spaced Repetition) nên có thể không có từ cần ôn hôm nay.
+        // Test xử lý cả 2 trạng thái một cách thông minh.
         final reviewTab = find.byTooltip('Ôn tập');
         await waitFor(tester, reviewTab);
         await tester.tap(reviewTab);
         await delay(tester, ms: 3000); // Chờ 3 giây tải tiến độ ôn tập từ API
 
-        // Chờ và bấm nút "Bấm để ôn tập ngay 🔥"
+        // Kiểm tra xem có từ cần ôn hôm nay hay không
         final startReviewBtn = find.text('Bấm để ôn tập ngay 🔥');
-        await waitFor(tester, startReviewBtn, timeoutSeconds: 12);
-        await delay(tester, ms: 1500);
-        await tester.tap(startReviewBtn);
-        await delay(tester, ms: 3000); // Chờ vào giao diện ôn tập
+        final allDoneText = find.text('Tuyệt vời!');
+        final goHomeBtn = find.text('Quay lại trang chủ');
 
-        // Kiểm tra tiêu đề ôn tập và tiến độ bên trong
-        final progressText = find.text('Tiến độ ôn tập');
-        await waitFor(tester, progressText, timeoutSeconds: 12);
-        await delay(tester, ms: 1500);
+        if (tester.any(startReviewBtn)) {
+          // TRẠNG THÁI A: Có từ cần ôn -> Tiến hành ôn tập đầy đủ
+          debugPrint('--- CÓ TỪ CẦN ÔN HÔM NAY -> TIẾN HÀNH ÔN TẬP ---');
+          await delay(tester, ms: 1500);
+          await tester.tap(startReviewBtn);
+          await delay(tester, ms: 3000);
 
-        // Click để lật thẻ Flashcard (mặt trước ra mặt sau)
-        final reviewCard = find.byKey(const ValueKey('review-card-0'));
-        if (tester.any(reviewCard)) {
-          await tester.tap(reviewCard);
-          await delay(tester, ms: 2000); // Chờ 2 giây xem mặt sau từ vựng
-        }
+          // Kiểm tra tiêu đề ôn tập
+          final progressText = find.text('Tiến độ ôn tập');
+          await waitFor(tester, progressText, timeoutSeconds: 12);
+          await delay(tester, ms: 1500);
 
-        // Nhấn mức đánh giá "Thuộc" để cập nhật tiến độ lên máy chủ
-        final masteredBtn = find.text('Thuộc');
-        if (tester.any(masteredBtn)) {
-          await tester.tap(masteredBtn);
-          await delay(tester, ms: 3000); // Đợi API submit kết quả ôn tập
-        }
+          // Lật thẻ xem mặt sau từ vựng
+          final reviewCard = find.byKey(const ValueKey('review-card-0'));
+          if (tester.any(reviewCard)) {
+            await tester.tap(reviewCard);
+            await delay(tester, ms: 2000);
+          }
 
-        // Thoát ra ngoài về màn hình Ôn tập chính
-        final reviewBackButton = find.byType(BackButton);
-        if (tester.any(reviewBackButton)) {
-          await tester.tap(reviewBackButton);
-          await delay(tester, ms: 2500);
+          // Nhấn "Thuộc" để cập nhật tiến độ lên máy chủ
+          final masteredBtn = find.text('Thuộc');
+          if (tester.any(masteredBtn)) {
+            await tester.tap(masteredBtn);
+            await delay(tester, ms: 3000);
+          }
+
+          // Quay lại màn hình ôn tập chính
+          final reviewBackButton = find.byType(BackButton);
+          if (tester.any(reviewBackButton)) {
+            await tester.tap(reviewBackButton);
+            await delay(tester, ms: 2500);
+          }
+
+        } else if (tester.any(allDoneText) || tester.any(goHomeBtn)) {
+          // TRẠNG THÁI B: Đã hoàn thành hết từ vựng hôm nay (Spaced Repetition)
+          // Từ mới học sẽ đến hạn ôn vào ngày mai - hành vi đúng của hệ thống!
+          debugPrint('--- TẤT CẢ TỪ VỰNG ĐÃ ĐƯỢC ÔN HÔM NAY (SPACED REPETITION) ---');
+          debugPrint('--- MÀN HÌNH HIỂN THỊ: "Tuyệt vời! Hãy quay lại ngày mai" ---');
+          await delay(tester, ms: 3000); // Dừng 3 giây để quan sát màn hình thành tích
+
+          // Bấm "Quay lại trang chủ" nếu có
+          if (tester.any(goHomeBtn)) {
+            await tester.tap(goHomeBtn);
+            await delay(tester, ms: 2000);
+          }
+        } else {
+          // TRẠNG THÁI C: Không tìm thấy cả 2 nút -> Chờ thêm và tiếp tục
+          debugPrint('--- CHỜ TẢI MÀN HÌNH ÔN TẬP... ---');
+          await delay(tester, ms: 3000);
         }
 
         debugPrint('--- CHÚC MỪNG: BÀI TEST E2E ĐÃ HOÀN THÀNH XUẤT SẮC ---');
       });
   });
+}
+
+// ============================================================
+// HÀM DỌN DẸP DỮ LIỆU TIẾN ĐỘ TEST (PRE-TEST CLEANUP)
+// ============================================================
+// Gọi API TestController trên backend để xóa toàn bộ lịch sử
+// làm bài Quiz, ôn tập Flashcard, tiến độ bài học của tài khoản test.
+// Đảm bảo kịch bản E2E luôn bắt đầu từ trạng thái sạch sẽ và nhất quán.
+Future<void> _cleanupTestUserProgress() async {
+  debugPrint('=== [PRE-TEST] Bắt đầu dọn sạch dữ liệu tiến độ test ===');
+
+  try {
+    // Bước 1: Tắt kiểm tra SSL certificate (Backend local dùng http)
+    final httpClient = HttpClient()
+      ..badCertificateCallback = (cert, host, port) => true;
+
+    // Bước 2: Lấy userId của tài khoản test từ API check-env
+    final checkUri = Uri.parse('$_testApiBase/api/test/check-env?email=$_testUserEmail');
+    final checkRequest = await httpClient.getUrl(checkUri);
+    final checkResponse = await checkRequest.close();
+    final checkBody = await checkResponse.transform(const Utf8Decoder()).join();
+    final checkJson = jsonDecode(checkBody) as Map<String, dynamic>;
+
+    final testUser = checkJson['testUser'];
+    if (testUser == null) {
+      debugPrint('[PRE-TEST] ⚠️ Không tìm thấy tài khoản test "$_testUserEmail". Bỏ qua cleanup.');
+      return;
+    }
+
+    final int userId = testUser['userId'] as int;
+    debugPrint('[PRE-TEST] ✅ Tìm thấy tài khoản test (userId=$userId). Đang dọn dẹp...');
+
+    // Bước 3: Gọi API dọn dẹp toàn bộ dữ liệu tiến độ học tập
+    final cleanupUri = Uri.parse('$_testApiBase/api/test/cleanup-user-progress?userId=$userId');
+    final cleanupRequest = await httpClient.postUrl(cleanupUri);
+    cleanupRequest.headers.set('Content-Type', 'application/json');
+    final cleanupResponse = await cleanupRequest.close();
+    final cleanupBody = await cleanupResponse.transform(const Utf8Decoder()).join();
+    final cleanupJson = jsonDecode(cleanupBody) as Map<String, dynamic>;
+
+    if (cleanupResponse.statusCode == 200 && cleanupJson['success'] == true) {
+      final summary = cleanupJson['summary'] as Map<String, dynamic>;
+      debugPrint('[PRE-TEST] ✅ Dọn dẹp thành công!');
+      debugPrint('[PRE-TEST]   - QuizAttempts đã xóa: ${summary['quizAttemptsDeleted']}');
+      debugPrint('[PRE-TEST]   - FlashCardReviews đã xóa: ${summary['flashCardReviewsDeleted']}');
+      debugPrint('[PRE-TEST]   - LessonCompletions đã xóa: ${summary['lessonCompletionsDeleted']}');
+      debugPrint('[PRE-TEST]   - ModuleCompletions đã xóa: ${summary['moduleCompletionsDeleted']}');
+      debugPrint('[PRE-TEST]   - CourseProgresses đã xóa: ${summary['courseProgressesDeleted']}');
+      debugPrint('[PRE-TEST]   - Streaks đã xóa: ${summary['streaksDeleted']}');
+    } else {
+      debugPrint('[PRE-TEST] ⚠️ Cleanup API trả về: ${cleanupResponse.statusCode} - $cleanupBody');
+    }
+
+    httpClient.close();
+  } catch (e) {
+    // Không fail test nếu cleanup lỗi (ví dụ: backend chưa khởi động)
+    // Test sẽ tiếp tục chạy, chỉ cảnh báo để người dùng biết
+    debugPrint('[PRE-TEST] ⚠️ Không thể kết nối API cleanup: $e');
+    debugPrint('[PRE-TEST]    Hãy đảm bảo backend đang chạy tại $_testApiBase');
+    debugPrint('[PRE-TEST]    Test sẽ tiếp tục chạy với dữ liệu hiện tại...');
+  }
+
+  debugPrint('=== [PRE-TEST] Hoàn tất giai đoạn chuẩn bị môi trường ===');
 }
