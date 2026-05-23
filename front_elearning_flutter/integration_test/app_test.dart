@@ -35,8 +35,8 @@ void main() {
       testWidgets(
         'Kiểm thử luồng học tập khép kín của học viên',
         (WidgetTester tester) async {
-          // Khởi chạy ứng dụng thật
-          app.main();
+          // Khởi chạy ứng dụng thật và chờ khởi tạo xong
+          await app.main();
 
           // Chờ màn hình đầu tiên render: login form HOẶC home
           // (dùng waitForAny vì Flutter test không có Finder.or())
@@ -46,8 +46,8 @@ void main() {
               find.byKey(const ValueKey('email-field')),
               find.byTooltip('Khóa học'),
             ],
-            timeout: const Duration(seconds: 10),
-            reason: 'App không khởi động được trong 10 giây',
+            timeout: const Duration(seconds: 30),
+            reason: 'App không khởi động được trong 30 giây',
           );
 
           // ── BƯỚC 1: Đăng nhập (nếu chưa đăng nhập) ──────────

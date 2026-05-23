@@ -60,11 +60,19 @@ final authSessionProvider = Provider<AuthSessionService>((ref) {
 });
 
 final refreshDioProvider = Provider<Dio>((ref) {
-  return Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl));
+  return Dio(BaseOptions(
+    baseUrl: AppConfig.apiBaseUrl,
+    connectTimeout: Duration(milliseconds: AppConfig.connectTimeoutMs),
+    receiveTimeout: Duration(milliseconds: AppConfig.receiveTimeoutMs),
+  ));
 });
 
 final dioProvider = Provider<Dio>((ref) {
-  final dio = Dio(BaseOptions(baseUrl: AppConfig.apiBaseUrl));
+  final dio = Dio(BaseOptions(
+    baseUrl: AppConfig.apiBaseUrl,
+    connectTimeout: Duration(milliseconds: AppConfig.connectTimeoutMs),
+    receiveTimeout: Duration(milliseconds: AppConfig.receiveTimeoutMs),
+  ));
   final refreshDio = ref.read(refreshDioProvider);
   dio.interceptors.add(
     AuthInterceptor(

@@ -50,14 +50,16 @@ Future<void> cleanupTestUserProgress() async {
     if (checkResponse.statusCode == 403) {
       final msg = 'LỖI: ${checkJson['message'] ?? 'Forbidden'}';
       debugPrint('[PRE-TEST] $msg');
-      throw Exception(msg);
+      debugPrint('[PRE-TEST] BẮT BUỘC DỪNG HỦY TEST LẬP TỨC ĐỂ BẢO VỆ DATABASE DEV/PRODUCTION!');
+      exit(1);
     }
 
     final env = checkJson['environment'] as String?;
     if (env != 'E2E') {
       final msg = 'LỖI: Backend đang chạy ở môi trường "$env" thay vì "E2E"';
       debugPrint('[PRE-TEST] $msg');
-      throw Exception(msg);
+      debugPrint('[PRE-TEST] BẮT BUỘC DỪNG HỦY TEST LẬP TỨC ĐỂ BẢO VỆ DATABASE DEV/PRODUCTION!');
+      exit(1);
     }
 
     final testUser = checkJson['testUser'];
