@@ -679,11 +679,11 @@ Future<void> _answerFillIn(WidgetTester tester, {required int questionNumber}) a
     debugPrint('[FILL] Câu về deadline: Điền "$answerToType" (ĐÚNG)');
   } else if (fillContent.contains('evaluate') || fillContent.contains('marketing campaign') || fillContent.contains('results')) {
     // Câu: "important to ______ the results..." → "a"  SAI cố ý chọn sai câu này!
-    answerToType = 'abc';
+    answerToType = 'test';
     debugPrint('[FILL] Câu về evaluate/marketing: Điền "$answerToType" (SAI cố ý chọn sai câu này!)');
   } else if (fillContent.contains('smartphone') || fillContent.contains('electronic') || fillContent.contains('multi-functional')) {
     // Câu: "multi-functional electronic ______" → "a"  SAI cố ý chọn sai câu này!
-    answerToType = 'abc';
+    answerToType = 'test';
     debugPrint('[FILL] Câu về smartphone/electronic: Điền "$answerToType" (SAI cố ý chọn sai câu này!)');
   } else {
     answerToType = 'abc';
