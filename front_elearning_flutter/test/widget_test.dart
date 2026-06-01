@@ -2,7 +2,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:front_elearning_flutter/app/app.dart';
+import 'package:front_elearning_flutter/app/theme/theme_provider.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -19,8 +22,16 @@ ENABLE_NETWORK_LOG=false
     );
   });
 
-  testWidgets('App boots to auth screen', (WidgetTester tester) async {
-    await tester.pumpWidget(const ProviderScope(child: EnglishLearningApp()));
+  testWidgets('App boots successfully', (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+      ],
+      child: const EnglishLearningApp(),
+    ));
 
     await tester.pumpAndSettle();
 
