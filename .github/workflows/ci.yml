@@ -4,12 +4,19 @@ name: 🔄 Flutter CI
 # Chạy tự động khi:
 #   - Push code lên nhánh main hoặc develop
 #   - Mở / cập nhật Pull Request vào main hoặc develop
+#
+# CHỈ chạy khi có thay đổi trong thư mục front_elearning_flutter/
+# → Không chạy khi chỉ commit Backend hoặc file khác ngoài Flutter
 # ───────────────────────────────────────────────────────────────────
 on:
   push:
     branches: [ main, develop ]
+    paths:
+      - 'front_elearning_flutter/**'
   pull_request:
     branches: [ main, develop ]
+    paths:
+      - 'front_elearning_flutter/**'
 
 jobs:
   # ─────────────────────────────────────────────────────────────────
