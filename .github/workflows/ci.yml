@@ -13,10 +13,12 @@ on:
     branches: [ main, develop ]
     paths:
       - 'front_elearning_flutter/**'
+      - '.github/workflows/**'
   pull_request:
     branches: [ main, develop ]
     paths:
       - 'front_elearning_flutter/**'
+      - '.github/workflows/**'
 
 jobs:
   # ─────────────────────────────────────────────────────────────────
