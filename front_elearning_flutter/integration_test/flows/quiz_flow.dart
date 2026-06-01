@@ -879,8 +879,9 @@ Future<bool> _tapMatchingCardByKeyword(
     allFoundTexts.add(allTexts);
 
     // Keyword phải khớp với ít nhất 1 text trong card
-    if (!allTexts.any((t) => t.toLowerCase().contains(keyword.toLowerCase())))
+    if (!allTexts.any((t) => t.toLowerCase().contains(keyword.toLowerCase()))) {
       continue;
+    }
 
     // Skip card đã matched: nhận ra badge số ngắn ("1", "2", "3")
     final isAlreadyMatched = allTexts.any((t) {
