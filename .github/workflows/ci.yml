@@ -43,6 +43,10 @@ jobs:
         working-directory: front_elearning_flutter
         run: flutter pub get
 
+      - name: 📝 Create mock .env file for analysis
+        working-directory: front_elearning_flutter
+        run: touch .env
+
       - name: 🔍 Dart Analyze (static analysis)
         working-directory: front_elearning_flutter
         run: flutter analyze --no-pub
