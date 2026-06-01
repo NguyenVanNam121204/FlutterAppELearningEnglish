@@ -67,7 +67,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<void> _enrollCourse(HomeCourseModel course) async {
-    await context.push("${RoutePaths.courseDetail}?courseId=${course.courseId}");
+    await context.push(
+      "${RoutePaths.courseDetail}?courseId=${course.courseId}",
+    );
     if (mounted) {
       ref.read(homeViewModelProvider.notifier).loadHomeData();
     }

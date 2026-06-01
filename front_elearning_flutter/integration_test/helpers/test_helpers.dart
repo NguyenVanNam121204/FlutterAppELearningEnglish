@@ -77,7 +77,7 @@ Future<void> waitForLoading(
   // Điều này giúp loại bỏ lỗi dính vòng lặp với các vòng xoay hiển thị tiến độ (value != null),
   // đồng thời TỰ ĐỘNG CHỜ ảnh CachedNetworkImage tải xong (vì placeholder dùng value == null).
   final loadingFinder = find.byWidgetPredicate(
-    (widget) => 
+    (widget) =>
         (widget is CircularProgressIndicator && widget.value == null) ||
         (widget is LinearProgressIndicator && widget.value == null),
     description: 'Indeterminate ProgressIndicator',
@@ -134,7 +134,7 @@ Future<void> tapAndWaitFor(
   // 2. Chờ luôn mọi Loading Indicator (bao gồm Placeholder của Ảnh Minio) biến mất!
   await waitForLoading(tester, timeout: const Duration(seconds: 10));
   // 3. Dừng hình 1 chút cho mắt người nhìn
-  await _visualPause(tester); 
+  await _visualPause(tester);
 }
 
 /// Tap một widget rồi chờ loading indicator biến mất (sau khi gọi API).
@@ -162,9 +162,8 @@ Future<void> tapAndWaitForLoad(
 /// ```dart
 /// await waitFor(tester, findAnyText(['HOÀN THÀNH', 'Hoàn thành']));
 /// ```
-Finder findAnyText(List<String> texts) => find.byWidgetPredicate(
-      (w) => w is Text && texts.contains(w.data),
-    );
+Finder findAnyText(List<String> texts) =>
+    find.byWidgetPredicate((w) => w is Text && texts.contains(w.data));
 
 /// Chờ cho đến khi BẤT KỲ widget nào trong danh sách xuất hiện.
 ///

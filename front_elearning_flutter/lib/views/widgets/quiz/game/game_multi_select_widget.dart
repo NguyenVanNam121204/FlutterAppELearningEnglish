@@ -42,13 +42,17 @@ class GameMultiSelectWidget extends StatelessWidget {
               const SizedBox(height: 8),
               const Text(
                 "(Chọn nhiều đáp án)",
-                style: TextStyle(color: GameQuizColors.secondary, fontSize: 14, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  color: GameQuizColors.secondary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),
         ),
         const SizedBox(height: 32),
-        
+
         // Options List
         ...options.map((option) {
           final isSelected = selectedOptionIds.contains(option.id);
@@ -58,19 +62,22 @@ class GameMultiSelectWidget extends StatelessWidget {
               onTap: () => onOptionToggled(option.id, !isSelected),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 18,
+                ),
                 decoration: BoxDecoration(
-                  color: isSelected 
-                      ? GameQuizColors.primary.withValues(alpha: 0.2) 
+                  color: isSelected
+                      ? GameQuizColors.primary.withValues(alpha: 0.2)
                       : GameQuizColors.surface,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: isSelected 
-                        ? GameQuizColors.secondary 
+                    color: isSelected
+                        ? GameQuizColors.secondary
                         : Colors.white.withValues(alpha: 0.1),
                     width: 2,
                   ),
-                  boxShadow: isSelected 
+                  boxShadow: isSelected
                       ? GameQuizStyles.neonShadow(GameQuizColors.secondary)
                       : null,
                 ),
@@ -81,15 +88,23 @@ class GameMultiSelectWidget extends StatelessWidget {
                       width: 28,
                       height: 28,
                       decoration: BoxDecoration(
-                        color: isSelected ? GameQuizColors.secondary : Colors.transparent,
+                        color: isSelected
+                            ? GameQuizColors.secondary
+                            : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: isSelected ? GameQuizColors.secondary : Colors.white38,
+                          color: isSelected
+                              ? GameQuizColors.secondary
+                              : Colors.white38,
                           width: 2,
                         ),
                       ),
-                      child: isSelected 
-                          ? const Icon(Icons.check, size: 20, color: Colors.black)
+                      child: isSelected
+                          ? const Icon(
+                              Icons.check,
+                              size: 20,
+                              color: Colors.black,
+                            )
                           : null,
                     ),
                     const SizedBox(width: 16),
@@ -98,9 +113,13 @@ class GameMultiSelectWidget extends StatelessWidget {
                       child: Text(
                         option.text,
                         style: TextStyle(
-                          color: isSelected ? Colors.white : GameQuizColors.textSecondary,
+                          color: isSelected
+                              ? Colors.white
+                              : GameQuizColors.textSecondary,
                           fontSize: 18,
-                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                          fontWeight: isSelected
+                              ? FontWeight.w700
+                              : FontWeight.w500,
                         ),
                       ),
                     ),

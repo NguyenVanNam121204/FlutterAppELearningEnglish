@@ -190,7 +190,11 @@ class _PronunciationScreenState extends ConsumerState<PronunciationScreen> {
                                     ? scoreText
                                     : '/${p.phonetic}/ • $scoreText',
                                 style: TextStyle(
-                                  color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.color
+                                      ?.withValues(alpha: 0.7),
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -365,7 +369,9 @@ class _PronunciationSummaryCard extends StatelessWidget {
                       data: (summary) => Text(
                         '${summary.totalPracticed}/${summary.totalFlashcards} từ đã luyện • Điểm TB ${summary.averageScore.toStringAsFixed(1)}',
                         style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
+                          color: Theme.of(
+                            context,
+                          ).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -412,7 +418,9 @@ class _PronunciationSummaryCard extends StatelessWidget {
                                   ? 1
                                   : summary.totalFlashcards),
                           minHeight: 10,
-                          backgroundColor: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+                          backgroundColor: Theme.of(
+                            context,
+                          ).dividerColor.withValues(alpha: 0.1),
                           valueColor: const AlwaysStoppedAnimation(
                             Color(0xFF22D3EE),
                           ),
@@ -433,7 +441,9 @@ class _PronunciationSummaryCard extends StatelessWidget {
                         '${summary.totalPracticed}/${summary.totalFlashcards}',
                         style: TextStyle(
                           fontWeight: FontWeight.w800,
-                          color: Theme.of(context).colorScheme.onPrimaryContainer,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onPrimaryContainer,
                         ),
                       ),
                     ),

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../common/catalunya_card.dart';
 
@@ -21,7 +21,9 @@ class PaymentProductSummaryCard extends StatelessWidget {
     }
 
     final title = courseTitle.isNotEmpty ? courseTitle : packageName;
-    final subtitle = price.isNotEmpty ? 'GiÃ¡: $price' : 'Sáº£n pháº©m thanh toÃ¡n';
+    final subtitle = price.isNotEmpty
+        ? 'GiÃ¡: $price'
+        : 'Sáº£n pháº©m thanh toÃ¡n';
 
     return CatalunyaCard(
       child: ListTile(
@@ -35,4 +37,3 @@ class PaymentProductSummaryCard extends StatelessWidget {
     );
   }
 }
-

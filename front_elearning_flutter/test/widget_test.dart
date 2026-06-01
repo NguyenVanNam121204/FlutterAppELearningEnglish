@@ -26,12 +26,12 @@ ENABLE_NETWORK_LOG=false
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
 
-    await tester.pumpWidget(ProviderScope(
-      overrides: [
-        sharedPreferencesProvider.overrideWithValue(prefs),
-      ],
-      child: const EnglishLearningApp(),
-    ));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+        child: const EnglishLearningApp(),
+      ),
+    );
 
     await tester.pumpAndSettle();
 

@@ -39,16 +39,19 @@ class GameTrueFalseWidget extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 48),
-        
+
         // True/False Buttons
         Row(
           children: options.map((option) {
             final isSelected = selectedOptionId == option.id;
-            final isTrue = option.text.toLowerCase().contains('true') || 
-                          option.text.toLowerCase().contains('đúng') ||
-                          option.text.toLowerCase().contains('yes');
-            
-            final color = isTrue ? GameQuizColors.correct : GameQuizColors.incorrect;
+            final isTrue =
+                option.text.toLowerCase().contains('true') ||
+                option.text.toLowerCase().contains('đúng') ||
+                option.text.toLowerCase().contains('yes');
+
+            final color = isTrue
+                ? GameQuizColors.correct
+                : GameQuizColors.incorrect;
 
             return Expanded(
               child: Padding(
@@ -57,33 +60,44 @@ class GameTrueFalseWidget extends StatelessWidget {
                   onTap: () => onOptionSelected(option.id),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 8),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 24,
+                      horizontal: 8,
+                    ),
                     decoration: BoxDecoration(
-                      color: isSelected 
-                          ? color.withValues(alpha: 0.2) 
+                      color: isSelected
+                          ? color.withValues(alpha: 0.2)
                           : GameQuizColors.surface,
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
-                        color: isSelected 
-                            ? color 
+                        color: isSelected
+                            ? color
                             : Colors.white.withValues(alpha: 0.1),
                         width: 3,
                       ),
-                      boxShadow: isSelected ? GameQuizStyles.neonShadow(color) : null,
+                      boxShadow: isSelected
+                          ? GameQuizStyles.neonShadow(color)
+                          : null,
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          isTrue ? Icons.check_circle_outline : Icons.cancel_outlined,
+                          isTrue
+                              ? Icons.check_circle_outline
+                              : Icons.cancel_outlined,
                           size: 48,
-                          color: isSelected ? color : GameQuizColors.textSecondary,
+                          color: isSelected
+                              ? color
+                              : GameQuizColors.textSecondary,
                         ),
                         const SizedBox(height: 12),
                         Text(
                           option.text.toUpperCase(),
                           style: TextStyle(
-                            color: isSelected ? Colors.white : GameQuizColors.textSecondary,
+                            color: isSelected
+                                ? Colors.white
+                                : GameQuizColors.textSecondary,
                             fontSize: 20,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 1.5,

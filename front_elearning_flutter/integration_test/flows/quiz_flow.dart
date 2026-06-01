@@ -1,4 +1,3 @@
-
 import '../helpers/test_helpers.dart';
 import 'package:front_elearning_flutter/views/widgets/quiz/game/game_multiple_choice_widget.dart';
 import 'package:front_elearning_flutter/views/widgets/quiz/game/game_true_false_widget.dart';
@@ -6,7 +5,6 @@ import 'package:front_elearning_flutter/views/widgets/quiz/game/game_multi_selec
 import 'package:front_elearning_flutter/views/widgets/quiz/game/game_fill_in_widget.dart';
 import 'package:front_elearning_flutter/views/widgets/quiz/game/game_matching_widget.dart';
 import 'package:front_elearning_flutter/views/widgets/quiz/game/game_ordering_widget.dart';
-
 
 // ============================================================
 // BƯỚC 4: LUỒNG LÀM QUIZ (QUIZ FLOW)
@@ -292,11 +290,14 @@ Future<void> _assertExpectedScore(WidgetTester tester) async {
 
   // Kiểm tra điểm số: UI có thể hiển thị "700", "700.0", "700,0"...
   // và số câu đúng: "7/13", "7 / 13", "7 câu đúng"...
-  final hasScore700 = allTexts.any((t) =>
-      t.contains('700') || t.replaceAll(' ', '').contains('7/13'));
-  final hasFraction7of13 = allTexts.any((t) =>
-      t.replaceAll(' ', '').contains('7/13') ||
-      (t.contains('7') && t.contains('13')));
+  final hasScore700 = allTexts.any(
+    (t) => t.contains('700') || t.replaceAll(' ', '').contains('7/13'),
+  );
+  final hasFraction7of13 = allTexts.any(
+    (t) =>
+        t.replaceAll(' ', '').contains('7/13') ||
+        (t.contains('7') && t.contains('13')),
+  );
 
   if (hasScore700 && hasFraction7of13) {
     debugPrint('Điểm số đúng kỳ vọng: 700 điểm (7/13 câu đúng)');
@@ -304,13 +305,14 @@ Future<void> _assertExpectedScore(WidgetTester tester) async {
   } else {
     debugPrint('Điểm số KHÔNG đúng kỳ vọng. Expected: 700đ (7/13 câu)');
     debugPrint('Tất cả text trên màn hình: $allTexts');
-    debugPrint('Kiểm tra: hasScore700=$hasScore700, hasFraction7of13=$hasFraction7of13');
+    debugPrint(
+      'Kiểm tra: hasScore700=$hasScore700, hasFraction7of13=$hasFraction7of13',
+    );
     // Không fail test cứng - chỉ cảnh báo để dễ debug
     // Bỏ comment dòng dưới nếu muốn fail test khi điểm sai:
     // fail('[QUIZ] Điểm kỳ vọng 7/13 (700đ) không khớp. Actual texts: $allTexts');
   }
 }
-
 
 /// Vào trang chi tiết bài làm rồi quay lại trang kết quả.
 Future<void> _viewAndReturnFromDetails(
@@ -364,7 +366,10 @@ Future<void> _viewAndReturnFromDetails(
 // ──────────────────────────────────────────────
 
 /// Phát hiện loại câu hỏi và chọn đáp án theo text đã định nghĩa trước.
-Future<void> _answerQuestion(WidgetTester tester, {required int questionNumber}) async {
+Future<void> _answerQuestion(
+  WidgetTester tester, {
+  required int questionNumber,
+}) async {
   // 1. Trắc nghiệm 1 lựa chọn (MultipleChoice)
   final mcWidget = find.byType(GameMultipleChoiceWidget);
   if (tester.any(mcWidget)) {
@@ -422,7 +427,10 @@ Future<void> _answerQuestion(WidgetTester tester, {required int questionNumber})
 /// là bất kỳ số nào từ 1-13. Ta xác định loại câu qua GameMultipleChoiceWidget
 /// và chọn text đáp án dựa trên NỘI DUNG câu hỏi đang hiển thị.
 
-Future<void> _answerMultipleChoice(WidgetTester tester, {required int questionNumber}) async {
+Future<void> _answerMultipleChoice(
+  WidgetTester tester, {
+  required int questionNumber,
+}) async {
   // Đọc text câu hỏi hiện tại từ widget để xác định nên chọn đáp án nào
   final mcWidget = find.byType(GameMultipleChoiceWidget);
 
@@ -439,38 +447,60 @@ Future<void> _answerMultipleChoice(WidgetTester tester, {required int questionNu
     }
   } catch (_) {}
 
-  debugPrint('[MC] Câu hỏi $questionNumber: "${questionText.length > 60 ? questionText.substring(0, 60) : questionText}..."');
+  debugPrint(
+    '[MC] Câu hỏi $questionNumber: "${questionText.length > 60 ? questionText.substring(0, 60) : questionText}..."',
+  );
 
   // Xác định text đáp án cần chọn dựa vào nội dung câu hỏi
   String targetOptionText = '';
 
-  if (questionText.toLowerCase().contains('beverage') && questionText.toLowerCase().contains('what is a')) {
+  if (questionText.toLowerCase().contains('beverage') &&
+      questionText.toLowerCase().contains('what is a')) {
     // Câu: What is a "beverage"? → Chọn "A drink of any type"  ĐÚNG
     targetOptionText = 'A drink of any type';
     debugPrint('[MC] Câu về beverage: Chọn "$targetOptionText" (ĐÚNG)');
-  } else if (questionText.toLowerCase().contains('person that you work with') || questionText.toLowerCase().contains('especially in a professional job')) {
+  } else if (questionText.toLowerCase().contains('person that you work with') ||
+      questionText.toLowerCase().contains('especially in a professional job')) {
     // Câu: A person that you work with... → Chọn "Customer"  SAI cố ý chọn sai câu này!
     targetOptionText = 'Customer';
-    debugPrint('[MC] Câu về colleague: Chọn "$targetOptionText" (SAI cố ý chọn sai câu này!)');
-  } else if (questionText.toLowerCase().contains('paris is a popular') || questionText.toLowerCase().contains('tourist')) {
+    debugPrint(
+      '[MC] Câu về colleague: Chọn "$targetOptionText" (SAI cố ý chọn sai câu này!)',
+    );
+  } else if (questionText.toLowerCase().contains('paris is a popular') ||
+      questionText.toLowerCase().contains('tourist')) {
     // Câu: Paris is a popular tourist... → Chọn "promotion"  SAI cố ý  chọn sai câu này!
     targetOptionText = 'promotion';
-    debugPrint('[MC] Câu về Paris/tourist: Chọn "$targetOptionText" (SAI cố ý chọn sai câu này!)');
-  } else if (questionText.toLowerCase().contains('essential for maintaining a healthy body') || questionText.toLowerCase().contains('preventing diseases')) {
+    debugPrint(
+      '[MC] Câu về Paris/tourist: Chọn "$targetOptionText" (SAI cố ý chọn sai câu này!)',
+    );
+  } else if (questionText.toLowerCase().contains(
+        'essential for maintaining a healthy body',
+      ) ||
+      questionText.toLowerCase().contains('preventing diseases')) {
     // Câu: Good ______ is essential... → Chọn "Colleague"  SAI cố ý chọn sai câu này!
     targetOptionText = 'Colleague';
-    debugPrint('[MC] Câu về healthy body: Chọn "$targetOptionText" (SAI cố ý chọn sai câu này!)');
-  } else if (questionText.toLowerCase().contains('gym') || questionText.toLowerCase().contains('high-intensity')) {
+    debugPrint(
+      '[MC] Câu về healthy body: Chọn "$targetOptionText" (SAI cố ý chọn sai câu này!)',
+    );
+  } else if (questionText.toLowerCase().contains('gym') ||
+      questionText.toLowerCase().contains('high-intensity')) {
     // Câu: ...goes to the gym for a high-intensity... → Chọn "Beverage"  SAI cố ý chọn sai câu này!
     targetOptionText = 'Beverage';
-    debugPrint('[MC] Câu về gym/workout: Chọn "$targetOptionText" (SAI cố ý chọn sai câu này!)');
-  } else if (questionText.toLowerCase().contains('fresh') || questionText.toLowerCase().contains('secret to making')) {
+    debugPrint(
+      '[MC] Câu về gym/workout: Chọn "$targetOptionText" (SAI cố ý chọn sai câu này!)',
+    );
+  } else if (questionText.toLowerCase().contains('fresh') ||
+      questionText.toLowerCase().contains('secret to making')) {
     // Câu: Fresh ______ are the secret... → Chọn "Ingredients"  ĐÚNG
     targetOptionText = 'Ingredients';
-    debugPrint('[MC] Câu về fresh/ingredients: Chọn "$targetOptionText" (ĐÚNG)');
+    debugPrint(
+      '[MC] Câu về fresh/ingredients: Chọn "$targetOptionText" (ĐÚNG)',
+    );
   } else {
     // Fallback: Chọn đáp án đầu tiên nếu không nhận diện được câu hỏi
-    debugPrint('[MC] Không nhận diện được câu hỏi. Chọn đáp án đầu tiên (fallback).');
+    debugPrint(
+      '[MC] Không nhận diện được câu hỏi. Chọn đáp án đầu tiên (fallback).',
+    );
     final mcOptions = find.descendant(
       of: mcWidget,
       matching: find.byType(GestureDetector),
@@ -500,16 +530,18 @@ Future<void> _answerMultipleChoice(WidgetTester tester, {required int questionNu
       matching: find.byType(Text),
     );
     if (tester.any(textsInGesture)) {
-      final texts = tester.widgetList(textsInGesture)
+      final texts = tester
+          .widgetList(textsInGesture)
           .map((w) => (w as Text).data ?? '')
           .toList();
-      
+
       // Chỉ tìm các text có độ dài > 1 (bỏ qua nhãn 'A', 'B', 'C', 'D'...)
       final meaningfulTexts = texts.where((t) => t.length > 2).toList();
-      
-      final matchFound = meaningfulTexts.any((t) =>
-          t.toLowerCase().contains(targetOptionText.toLowerCase()));
-          
+
+      final matchFound = meaningfulTexts.any(
+        (t) => t.toLowerCase().contains(targetOptionText.toLowerCase()),
+      );
+
       if (matchFound) {
         await tester.ensureVisible(gestureDetector);
         await tester.pump(const Duration(milliseconds: 300));
@@ -524,7 +556,9 @@ Future<void> _answerMultipleChoice(WidgetTester tester, {required int questionNu
 
   if (!tapped) {
     // Nếu không tìm thấy text khớp → chọn đáp án đầu tiên (fallback)
-    debugPrint('[MC] Không tìm thấy đáp án "$targetOptionText". Dùng đáp án đầu tiên (fallback).');
+    debugPrint(
+      '[MC] Không tìm thấy đáp án "$targetOptionText". Dùng đáp án đầu tiên (fallback).',
+    );
     if (tester.any(allGestureDetectors)) {
       await tester.ensureVisible(allGestureDetectors.first);
       await tester.pump(const Duration(milliseconds: 300));
@@ -539,7 +573,10 @@ Future<void> _answerMultipleChoice(WidgetTester tester, {required int questionNu
 // ──────────────────────────────────────────────
 
 /// Câu: "...promotion means lower position..." → Chọn "False"  ĐÚNG
-Future<void> _answerTrueFalse(WidgetTester tester, {required int questionNumber}) async {
+Future<void> _answerTrueFalse(
+  WidgetTester tester, {
+  required int questionNumber,
+}) async {
   final tfWidget = find.byType(GameTrueFalseWidget);
   debugPrint('[TF] Câu $questionNumber: Tìm và chọn "False" (ĐÚNG)');
 
@@ -558,7 +595,8 @@ Future<void> _answerTrueFalse(WidgetTester tester, {required int questionNumber}
       matching: find.byType(Text),
     );
     if (tester.any(textsInGesture)) {
-      final texts = tester.widgetList(textsInGesture)
+      final texts = tester
+          .widgetList(textsInGesture)
           .map((w) => ((w as Text).data ?? '').toLowerCase())
           .toList();
       if (texts.any((t) => t.contains('false') || t.contains('sai'))) {
@@ -589,9 +627,14 @@ Future<void> _answerTrueFalse(WidgetTester tester, {required int questionNumber}
 // ──────────────────────────────────────────────
 
 /// Câu: "Which activities are healthy?" → Chọn workout + nutrition  ĐÚNG
-Future<void> _answerMultiSelect(WidgetTester tester, {required int questionNumber}) async {
+Future<void> _answerMultiSelect(
+  WidgetTester tester, {
+  required int questionNumber,
+}) async {
   final msWidget = find.byType(GameMultiSelectWidget);
-  debugPrint('[MS] Câu $questionNumber: Chọn đáp án "workout" và "nutrition" (ĐÚNG)');
+  debugPrint(
+    '[MS] Câu $questionNumber: Chọn đáp án "workout" và "nutrition" (ĐÚNG)',
+  );
 
   // Các từ khóa text của 2 đáp án ĐÚNG cần chọn
   const correctKeywords = ['workout', 'nutrition'];
@@ -610,11 +653,13 @@ Future<void> _answerMultiSelect(WidgetTester tester, {required int questionNumbe
       matching: find.byType(Text),
     );
     if (tester.any(textsInGesture)) {
-      final texts = tester.widgetList(textsInGesture)
+      final texts = tester
+          .widgetList(textsInGesture)
           .map((w) => ((w as Text).data ?? '').toLowerCase())
           .toList();
-      final isCorrect = correctKeywords.any((keyword) =>
-          texts.any((t) => t.contains(keyword)));
+      final isCorrect = correctKeywords.any(
+        (keyword) => texts.any((t) => t.contains(keyword)),
+      );
       if (isCorrect) {
         await tester.ensureVisible(gestureDetector);
         await tester.pump(const Duration(milliseconds: 300));
@@ -627,7 +672,9 @@ Future<void> _answerMultiSelect(WidgetTester tester, {required int questionNumbe
   }
 
   if (selectedCount == 0) {
-    debugPrint('[MS] Không tìm thấy đáp án theo từ khóa. Chọn 2 đáp án đầu tiên (fallback).');
+    debugPrint(
+      '[MS] Không tìm thấy đáp án theo từ khóa. Chọn 2 đáp án đầu tiên (fallback).',
+    );
     final fallbackCount = tester.widgetList(allGestureDetectors).length;
     for (int i = 0; i < 2 && i < fallbackCount; i++) {
       await tester.ensureVisible(allGestureDetectors.at(i));
@@ -648,7 +695,10 @@ Future<void> _answerMultiSelect(WidgetTester tester, {required int questionNumbe
 ///  - "evaluate" / "marketing"    → "abc"         SAI cố ý chọn sai câu này!
 ///  - "electronic" / "smartphone" → "abc"         SAI cố ý chọn sai câu này!
 
-Future<void> _answerFillIn(WidgetTester tester, {required int questionNumber}) async {
+Future<void> _answerFillIn(
+  WidgetTester tester, {
+  required int questionNumber,
+}) async {
   final fillWidget = find.byType(GameFillInWidget);
   debugPrint('[FILL] Câu $questionNumber: Điền chữ vào ô trống');
 
@@ -660,7 +710,8 @@ Future<void> _answerFillIn(WidgetTester tester, {required int questionNumber}) a
       matching: find.byType(Text),
     );
     if (tester.any(textWidgets)) {
-      final texts = tester.widgetList(textWidgets)
+      final texts = tester
+          .widgetList(textWidgets)
           .map((w) => (w as Text).data ?? '')
           .where((t) => t.isNotEmpty)
           .join(' ');
@@ -668,26 +719,40 @@ Future<void> _answerFillIn(WidgetTester tester, {required int questionNumber}) a
     }
   } catch (_) {}
 
-  debugPrint('[FILL] Nội dung câu hỏi: "${fillContent.length > 80 ? fillContent.substring(0, 80) : fillContent}"');
+  debugPrint(
+    '[FILL] Nội dung câu hỏi: "${fillContent.length > 80 ? fillContent.substring(0, 80) : fillContent}"',
+  );
 
   // Xác định đáp án cần điền dựa vào nội dung câu hỏi
   String answerToType;
 
-  if (fillContent.contains('meet the') || fillContent.contains('new project') || fillContent.contains('deadline')) {
+  if (fillContent.contains('meet the') ||
+      fillContent.contains('new project') ||
+      fillContent.contains('deadline')) {
     // Câu: "meet the ______ for the new project" → "deadline"  ĐÚNG
     answerToType = 'deadline';
     debugPrint('[FILL] Câu về deadline: Điền "$answerToType" (ĐÚNG)');
-  } else if (fillContent.contains('evaluate') || fillContent.contains('marketing campaign') || fillContent.contains('results')) {
+  } else if (fillContent.contains('evaluate') ||
+      fillContent.contains('marketing campaign') ||
+      fillContent.contains('results')) {
     // Câu: "important to ______ the results..." → "a"  SAI cố ý chọn sai câu này!
     answerToType = 'test';
-    debugPrint('[FILL] Câu về evaluate/marketing: Điền "$answerToType" (SAI cố ý chọn sai câu này!)');
-  } else if (fillContent.contains('smartphone') || fillContent.contains('electronic') || fillContent.contains('multi-functional')) {
+    debugPrint(
+      '[FILL] Câu về evaluate/marketing: Điền "$answerToType" (SAI cố ý chọn sai câu này!)',
+    );
+  } else if (fillContent.contains('smartphone') ||
+      fillContent.contains('electronic') ||
+      fillContent.contains('multi-functional')) {
     // Câu: "multi-functional electronic ______" → "a"  SAI cố ý chọn sai câu này!
     answerToType = 'test';
-    debugPrint('[FILL] Câu về smartphone/electronic: Điền "$answerToType" (SAI cố ý chọn sai câu này!)');
+    debugPrint(
+      '[FILL] Câu về smartphone/electronic: Điền "$answerToType" (SAI cố ý chọn sai câu này!)',
+    );
   } else {
     answerToType = 'abc';
-    debugPrint('[FILL] Không nhận diện được câu FillIn. Điền "$answerToType" (fallback).');
+    debugPrint(
+      '[FILL] Không nhận diện được câu FillIn. Điền "$answerToType" (fallback).',
+    );
   }
 
   // Điền từng ký tự vào các ô trống
@@ -734,9 +799,14 @@ Future<void> _answerFillIn(WidgetTester tester, {required int questionNumber}) a
 ///   GameMatchingWidget: tap card đã matched → gọi onUnmatch → BỊ THÁO NỐI.
 ///   → Nhận biết card đã matched qua badge số "1", "2", "3" và bỏ qua.
 
-Future<void> _answerMatching(WidgetTester tester, {required int questionNumber}) async {
+Future<void> _answerMatching(
+  WidgetTester tester, {
+  required int questionNumber,
+}) async {
   final matchingWidget = find.byType(GameMatchingWidget);
-  debugPrint('[MATCH] Câu $questionNumber: Nối cặp theo text (fresh-discover mỗi tap)');
+  debugPrint(
+    '[MATCH] Câu $questionNumber: Nối cặp theo text (fresh-discover mỗi tap)',
+  );
 
   // Sử dụng keyword ngắn, độc nhất để đảm bảo luôn match được text trên UI
   const correctPairs = <String, String>{
@@ -748,7 +818,9 @@ Future<void> _answerMatching(WidgetTester tester, {required int questionNumber})
   for (final entry in correctPairs.entries) {
     // Tap trái: fresh-discover để tránh stale index sau rebuild
     final tappedLeft = await _tapMatchingCardByKeyword(
-      tester, matchingWidget, entry.key,
+      tester,
+      matchingWidget,
+      entry.key,
     );
     if (!tappedLeft) {
       debugPrint('[MATCH] Không tìm thấy card trái: "${entry.key}"');
@@ -758,10 +830,14 @@ Future<void> _answerMatching(WidgetTester tester, {required int questionNumber})
 
     // Tap phải: fresh-discover SAU KHI widget đã rebuild từ tap trái
     final tappedRight = await _tapMatchingCardByKeyword(
-      tester, matchingWidget, entry.value,
+      tester,
+      matchingWidget,
+      entry.value,
     );
     if (!tappedRight) {
-      debugPrint('[MATCH] Không tìm thấy card phải cho: "${entry.key}" (keyword: "${entry.value}")');
+      debugPrint(
+        '[MATCH] Không tìm thấy card phải cho: "${entry.key}" (keyword: "${entry.value}")',
+      );
       continue;
     }
     await tester.pump(const Duration(milliseconds: 400));
@@ -794,15 +870,17 @@ Future<bool> _tapMatchingCardByKeyword(
     final textsInGd = find.descendant(of: gd, matching: find.byType(Text));
     if (!tester.any(textsInGd)) continue;
 
-    final allTexts = tester.widgetList(textsInGd)
+    final allTexts = tester
+        .widgetList(textsInGd)
         .map((w) => (w as Text).data ?? '')
         .where((t) => t.trim().isNotEmpty)
         .toList();
-    
+
     allFoundTexts.add(allTexts);
 
     // Keyword phải khớp với ít nhất 1 text trong card
-    if (!allTexts.any((t) => t.toLowerCase().contains(keyword.toLowerCase()))) continue;
+    if (!allTexts.any((t) => t.toLowerCase().contains(keyword.toLowerCase())))
+      continue;
 
     // Skip card đã matched: nhận ra badge số ngắn ("1", "2", "3")
     final isAlreadyMatched = allTexts.any((t) {
@@ -817,11 +895,15 @@ Future<bool> _tapMatchingCardByKeyword(
     await tester.ensureVisible(gd);
     await tester.pump(const Duration(milliseconds: 100));
     await tester.tap(gd, warnIfMissed: false);
-    debugPrint('[MATCH] → Tap: "${keyword.length > 30 ? keyword.substring(0, 30) : keyword}"');
+    debugPrint(
+      '[MATCH] → Tap: "${keyword.length > 30 ? keyword.substring(0, 30) : keyword}"',
+    );
     return true;
   }
-  
-  debugPrint('[MATCH DEBUG] Failed to find keyword: "$keyword". Available cards texts: $allFoundTexts');
+
+  debugPrint(
+    '[MATCH DEBUG] Failed to find keyword: "$keyword". Available cards texts: $allFoundTexts',
+  );
   return false;
 }
 
@@ -833,9 +915,14 @@ Future<bool> _tapMatchingCardByKeyword(
 ///
 /// Chiến lược: Tìm từng từ theo text và tap theo thứ tự đúng.
 
-Future<void> _answerOrdering(WidgetTester tester, {required int questionNumber}) async {
+Future<void> _answerOrdering(
+  WidgetTester tester, {
+  required int questionNumber,
+}) async {
   final orderingWidget = find.byType(GameOrderingWidget);
-  debugPrint('[ORDER] Câu $questionNumber: Sắp xếp "He received a promotion last month"');
+  debugPrint(
+    '[ORDER] Câu $questionNumber: Sắp xếp "He received a promotion last month"',
+  );
 
   // Thứ tự đúng của các từ cần tap
   const correctOrder = ['He', 'received', 'a', 'promotion', 'last', 'month'];
@@ -861,12 +948,10 @@ Future<void> _answerOrdering(WidgetTester tester, {required int questionNumber})
     final gdCount = tester.widgetList(allGDs).length;
     for (int i = 0; i < gdCount; i++) {
       final gd = allGDs.at(i);
-      final textsInGd = find.descendant(
-        of: gd,
-        matching: find.byType(Text),
-      );
+      final textsInGd = find.descendant(of: gd, matching: find.byType(Text));
       if (tester.any(textsInGd)) {
-        final texts = tester.widgetList(textsInGd)
+        final texts = tester
+            .widgetList(textsInGd)
             .map((w) => (w as Text).data ?? '')
             .toList();
         if (texts.any((t) => t == word)) {

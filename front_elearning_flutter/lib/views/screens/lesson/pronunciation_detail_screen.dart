@@ -382,7 +382,9 @@ class _PronunciationDetailScreenState
                         borderRadius: BorderRadius.circular(10),
                         child: LinearProgressIndicator(
                           value: (safeIndex + 1) / _localItems.length,
-                          backgroundColor: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+                          backgroundColor: Theme.of(
+                            context,
+                          ).dividerColor.withValues(alpha: 0.1),
                           valueColor: const AlwaysStoppedAnimation<Color>(
                             Colors.blue,
                           ),
@@ -487,7 +489,9 @@ class _PronunciationDetailScreenState
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontWeight: FontWeight.w900,
-                                color: Theme.of(context).textTheme.headlineMedium?.color,
+                                color: Theme.of(
+                                  context,
+                                ).textTheme.headlineMedium?.color,
                                 letterSpacing: -0.5,
                                 fontSize: 32,
                               ),
@@ -501,13 +505,19 @@ class _PronunciationDetailScreenState
                                     vertical: 6,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Theme.of(context).cardColor.withValues(alpha: 0.5),
+                                    color: Theme.of(
+                                      context,
+                                    ).cardColor.withValues(alpha: 0.5),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
                                     '/${current.phonetic}/',
                                     style: TextStyle(
-                                      color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.color
+                                          ?.withValues(alpha: 0.8),
                                       fontWeight: FontWeight.w600,
                                       fontSize: 16,
                                       letterSpacing: 0.5,
@@ -520,7 +530,11 @@ class _PronunciationDetailScreenState
                               current.meaning,
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                color: Theme.of(context).textTheme.titleMedium?.color?.withValues(alpha: 0.9),
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.color
+                                    ?.withValues(alpha: 0.9),
                                 fontWeight: FontWeight.w700,
                                 fontSize: 18,
                               ),
@@ -535,7 +549,11 @@ class _PronunciationDetailScreenState
                               style: TextStyle(
                                 color: _isRecording
                                     ? Colors.red
-                                    : Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
+                                    : Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color
+                                          ?.withValues(alpha: 0.6),
                                 fontWeight: FontWeight.w700,
                                 fontSize: 13,
                               ),
@@ -681,7 +699,9 @@ class _PronunciationDetailScreenState
                                     label: Text(
                                       'Từ trước',
                                       style: TextStyle(
-                                        color: Theme.of(context).textTheme.bodySmall?.color,
+                                        color: Theme.of(
+                                          context,
+                                        ).textTheme.bodySmall?.color,
                                         fontSize: 12,
                                       ),
                                     ),

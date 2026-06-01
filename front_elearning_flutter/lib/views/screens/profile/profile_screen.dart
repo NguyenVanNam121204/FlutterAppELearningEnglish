@@ -127,7 +127,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             case Success<void>():
                               if (!context.mounted) return;
                               Navigator.of(context).pop(); // Close the dialog
-                              
+
                               ScaffoldMessenger.of(rootContext).showSnackBar(
                                 const SnackBar(
                                   content: Text('Đổi mật khẩu thành công'),
@@ -234,17 +234,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           switch (result) {
                             case Success<UserModel>():
                               if (!context.mounted) return;
-                              Navigator.of(context).pop(); // Close the dialog first
-                              
+                              Navigator.of(
+                                context,
+                              ).pop(); // Close the dialog first
+
                               ref.invalidate(profileDataProvider);
                               await ref
                                   .read(authViewModelProvider.notifier)
                                   .refreshProfile(silent: true);
-                                  
+
                               if (!rootContext.mounted) return;
                               ScaffoldMessenger.of(rootContext).showSnackBar(
                                 const SnackBar(
-                                  content: Text('Cập nhật thông tin thành công'),
+                                  content: Text(
+                                    'Cập nhật thông tin thành công',
+                                  ),
                                 ),
                               );
                             case Failure<UserModel>(:final error):

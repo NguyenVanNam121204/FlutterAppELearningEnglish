@@ -35,26 +35,18 @@ class _MyCourseScreenState extends ConsumerState<MyCourseScreen> {
     }
 
     if (state.isLoading && state.courses.isEmpty) {
-      return const CatalunyaScaffold(
-        appBar: null,
-        body: LoadingStateView(),
-      );
+      return const CatalunyaScaffold(appBar: null, body: LoadingStateView());
     }
 
     if (state.errorMessage != null && state.courses.isEmpty) {
       return CatalunyaScaffold(
         appBar: AppBar(title: const Text('Khóa học của tôi')),
-        body: ErrorStateView(
-          message: state.errorMessage!,
-        ),
+        body: ErrorStateView(message: state.errorMessage!),
       );
     }
 
     return CatalunyaScaffold(
-      appBar: AppBar(
-        title: const Text('Khóa học của tôi'),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text('Khóa học của tôi'), elevation: 0),
       body: RefreshIndicator(
         onRefresh: onRefresh,
         child: Builder(
@@ -79,9 +71,13 @@ class _MyCourseScreenState extends ConsumerState<MyCourseScreen> {
                     item: c,
                     index: index,
                     onTap: () async {
-                      await context.push(RoutePaths.courseInCourses(c.courseId));
+                      await context.push(
+                        RoutePaths.courseInCourses(c.courseId),
+                      );
                       if (context.mounted) {
-                        ref.read(myCourseViewModelProvider.notifier).loadMyCourses();
+                        ref
+                            .read(myCourseViewModelProvider.notifier)
+                            .loadMyCourses();
                       }
                     },
                   ),

@@ -81,14 +81,15 @@ class QuizQuestionModel {
     );
     return QuizQuestionModel(
       questionId: (json['questionId'] ?? json['QuestionId'] ?? '').toString(),
-      content: (json['content'] ??
-              json['Content'] ??
-              json['stemText'] ??
-              json['StemText'] ??
-              json['questionText'] ??
-              json['QuestionText'] ??
-              '')
-          .toString(),
+      content:
+          (json['content'] ??
+                  json['Content'] ??
+                  json['stemText'] ??
+                  json['StemText'] ??
+                  json['questionText'] ??
+                  json['QuestionText'] ??
+                  '')
+              .toString(),
       type: typeRaw is int ? typeRaw : int.tryParse(typeRaw.toString()) ?? 1,
       options: optionsRaw.map(QuizOptionModel.fromJson).toList(),
       metadataJson: (json['metadataJson'] ?? json['MetadataJson'])?.toString(),
@@ -294,7 +295,9 @@ class QuizAttemptStartModel {
                   json['Title'])
               ?.toString(),
       startedAt: json['startedAt'] != null || json['StartedAt'] != null
-          ? DateTime.tryParse((json['startedAt'] ?? json['StartedAt']).toString())
+          ? DateTime.tryParse(
+              (json['startedAt'] ?? json['StartedAt']).toString(),
+            )
           : null,
       questions: questions,
       currentAnswers: answers,
@@ -335,6 +338,7 @@ class QuizActiveAttemptModel {
     );
   }
 }
+
 class QuizAttemptResultModel {
   const QuizAttemptResultModel({
     required this.quizId,
@@ -363,14 +367,21 @@ class QuizAttemptResultModel {
       quizId: (json['quizId'] ?? json['QuizId'] ?? '').toString(),
       attemptId: (json['attemptId'] ?? json['AttemptId'] ?? '').toString(),
       totalScore: (json['totalScore'] ?? json['TotalScore'] ?? 0.0).toDouble(),
-      totalPossibleScore: (json['totalPossibleScore'] ?? json['TotalPossibleScore'] ?? 0.0).toDouble(),
+      totalPossibleScore:
+          (json['totalPossibleScore'] ?? json['TotalPossibleScore'] ?? 0.0)
+              .toDouble(),
       percentage: (json['percentage'] ?? json['Percentage'] ?? 0.0).toDouble(),
       isPassed: json['isPassed'] ?? json['IsPassed'] ?? false,
-      questions: _asMapList(json['questions'] ?? json['Questions'])
-          .map(QuestionReviewModel.fromJson)
-          .toList(),
-      submittedAt: DateTime.parse(json['submittedAt'] ?? json['SubmittedAt'] ?? DateTime.now().toIso8601String()),
-      timeSpentSeconds: json['timeSpentSeconds'] ?? json['TimeSpentSeconds'] ?? 0,
+      questions: _asMapList(
+        json['questions'] ?? json['Questions'],
+      ).map(QuestionReviewModel.fromJson).toList(),
+      submittedAt: DateTime.parse(
+        json['submittedAt'] ??
+            json['SubmittedAt'] ??
+            DateTime.now().toIso8601String(),
+      ),
+      timeSpentSeconds:
+          json['timeSpentSeconds'] ?? json['TimeSpentSeconds'] ?? 0,
     );
   }
 }
@@ -416,7 +427,8 @@ class QuestionReviewModel {
   factory QuestionReviewModel.fromJson(Map<String, dynamic> json) {
     return QuestionReviewModel(
       questionId: (json['questionId'] ?? json['QuestionId'] ?? '').toString(),
-      questionText: (json['questionText'] ?? json['QuestionText'] ?? '').toString(),
+      questionText: (json['questionText'] ?? json['QuestionText'] ?? '')
+          .toString(),
       mediaUrl: json['mediaUrl'] ?? json['MediaUrl'],
       type: json['type'] ?? json['Type'] ?? 1,
       points: (json['points'] ?? json['Points'] ?? 0.0).toDouble(),
@@ -426,9 +438,9 @@ class QuestionReviewModel {
       userAnswerText: json['userAnswerText'] ?? json['UserAnswerText'],
       correctAnswer: json['correctAnswer'] ?? json['CorrectAnswer'],
       correctAnswerText: json['correctAnswerText'] ?? json['CorrectAnswerText'],
-      options: _asMapList(json['options'] ?? json['Options'])
-          .map(AnswerOptionReviewModel.fromJson)
-          .toList(),
+      options: _asMapList(
+        json['options'] ?? json['Options'],
+      ).map(AnswerOptionReviewModel.fromJson).toList(),
       metadataJson: json['metadataJson'] ?? json['MetadataJson'],
     );
   }
@@ -459,6 +471,7 @@ class AnswerOptionReviewModel {
     );
   }
 }
+
 class QuizHistoryItemModel {
   const QuizHistoryItemModel({
     required this.attemptId,
@@ -497,13 +510,16 @@ class QuizHistoryItemModel {
       duration: json['duration'] ?? json['Duration'],
       attemptNumber: json['attemptNumber'] ?? json['AttemptNumber'] ?? 0,
       startedAt: DateTime.parse(
-        json['startedAt'] ?? json['StartedAt'] ?? DateTime.now().toIso8601String(),
+        json['startedAt'] ??
+            json['StartedAt'] ??
+            DateTime.now().toIso8601String(),
       ),
       submittedAt: json['submittedAt'] != null || json['SubmittedAt'] != null
           ? DateTime.parse(json['submittedAt'] ?? json['SubmittedAt'])
           : null,
       status: json['status'] ?? json['Status'] ?? 1,
-      timeSpentSeconds: json['timeSpentSeconds'] ?? json['TimeSpentSeconds'] ?? 0,
+      timeSpentSeconds:
+          json['timeSpentSeconds'] ?? json['TimeSpentSeconds'] ?? 0,
       totalScore: (json['totalScore'] ?? json['TotalScore'] ?? 0.0).toDouble(),
       totalPossibleScore:
           (json['totalPossibleScore'] ?? json['TotalPossibleScore'] ?? 0.0)

@@ -35,25 +35,22 @@ class QuizHistoryViewModel extends StateNotifier<QuizHistoryState> {
 
   Future<void> loadHistory(String quizId) async {
     state = state.copyWith(isLoading: true);
-    
+
     final response = await _repository.getQuizHistory(quizId);
-    
+
     state = switch (response) {
-      Success(:final value) => state.copyWith(
-          isLoading: false,
-          history: value,
-        ),
+      Success(:final value) => state.copyWith(isLoading: false, history: value),
       Failure(:final error) => state.copyWith(
-          isLoading: false,
-          errorMessage: error.message,
-        ),
+        isLoading: false,
+        errorMessage: error.message,
+      ),
     };
   }
 }
 
 final quizHistoryProvider = StateNotifierProvider.autoDispose
     .family<QuizHistoryViewModel, QuizHistoryState, String>((ref, quizId) {
-  final vm = QuizHistoryViewModel(ref.read(quizRepositoryProvider));
-  vm.loadHistory(quizId);
-  return vm;
-});
+      final vm = QuizHistoryViewModel(ref.read(quizRepositoryProvider));
+      vm.loadHistory(quizId);
+      return vm;
+    });

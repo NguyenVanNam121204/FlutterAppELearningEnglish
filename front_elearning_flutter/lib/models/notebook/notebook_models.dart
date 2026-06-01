@@ -12,10 +12,14 @@ class NotebookModel {
   final bool isMastered;
 
   factory NotebookModel.fromJson(Map<String, dynamic> json) {
-    final nextReviewDate = _parseDate(json['nextReviewDate'] ?? json['NextReviewDate']);
+    final nextReviewDate = _parseDate(
+      json['nextReviewDate'] ?? json['NextReviewDate'],
+    );
     // In many SRS systems, a date far in the future or null next review date means mastered
-    final isMasteredFlag = (json['isMastered'] ?? json['IsMastered'] ?? false) as bool;
-    final isMasteredByDate = nextReviewDate != null && nextReviewDate.year > 2100;
+    final isMasteredFlag =
+        (json['isMastered'] ?? json['IsMastered'] ?? false) as bool;
+    final isMasteredByDate =
+        nextReviewDate != null && nextReviewDate.year > 2100;
 
     return NotebookModel(
       flashcard: FlashcardModel.fromJson(json),

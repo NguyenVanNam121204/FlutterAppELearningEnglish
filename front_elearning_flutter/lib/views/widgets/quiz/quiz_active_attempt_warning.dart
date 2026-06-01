@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class QuizActiveAttemptWarning extends StatelessWidget {
-  const QuizActiveAttemptWarning({
-    required this.onContinueOld,
-    super.key,
-  });
+  const QuizActiveAttemptWarning({required this.onContinueOld, super.key});
 
   final VoidCallback onContinueOld;
 
@@ -34,7 +31,9 @@ class QuizActiveAttemptWarning extends StatelessWidget {
             height: 4,
             margin: const EdgeInsets.only(bottom: 24),
             decoration: BoxDecoration(
-              color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.1),
+              color: (isDark ? Colors.white : Colors.black).withValues(
+                alpha: 0.1,
+              ),
               borderRadius: BorderRadius.circular(2),
             ),
           ),

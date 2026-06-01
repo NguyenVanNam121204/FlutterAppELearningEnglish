@@ -20,7 +20,9 @@ class CatalunyaCard extends StatelessWidget {
       margin: margin,
       padding: padding,
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white.withValues(alpha: 0.96),
+        color: isDark
+            ? const Color(0xFF1E293B)
+            : Colors.white.withValues(alpha: 0.96),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isDark ? const Color(0xFF334155) : const Color(0xFFDDE8F7),
@@ -39,4 +41,3 @@ class CatalunyaCard extends StatelessWidget {
     );
   }
 }
-

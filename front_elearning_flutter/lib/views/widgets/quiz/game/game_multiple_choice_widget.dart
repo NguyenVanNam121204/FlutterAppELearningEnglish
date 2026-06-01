@@ -39,7 +39,7 @@ class GameMultipleChoiceWidget extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 32),
-        
+
         // Options List
         ...options.map((option) {
           final isSelected = selectedOptionId == option.id;
@@ -50,27 +50,34 @@ class GameMultipleChoiceWidget extends StatelessWidget {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 curve: Curves.easeInOut,
-                transform: Matrix4.diagonal3Values(isSelected ? 1.02 : 1.0, isSelected ? 1.02 : 1.0, 1.0),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                transform: Matrix4.diagonal3Values(
+                  isSelected ? 1.02 : 1.0,
+                  isSelected ? 1.02 : 1.0,
+                  1.0,
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 18,
+                ),
                 decoration: BoxDecoration(
-                  color: isSelected 
-                      ? GameQuizColors.primary.withValues(alpha: 0.2) 
+                  color: isSelected
+                      ? GameQuizColors.primary.withValues(alpha: 0.2)
                       : GameQuizColors.surface,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: isSelected 
-                        ? GameQuizColors.secondary 
+                    color: isSelected
+                        ? GameQuizColors.secondary
                         : Colors.white.withValues(alpha: 0.1),
                     width: 2,
                   ),
-                  boxShadow: isSelected 
+                  boxShadow: isSelected
                       ? GameQuizStyles.neonShadow(GameQuizColors.secondary)
                       : [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.2),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
-                          )
+                          ),
                         ],
                 ),
                 child: Row(
@@ -80,8 +87,8 @@ class GameMultipleChoiceWidget extends StatelessWidget {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: isSelected 
-                            ? GameQuizColors.secondary 
+                        color: isSelected
+                            ? GameQuizColors.secondary
                             : Colors.white.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
@@ -101,9 +108,13 @@ class GameMultipleChoiceWidget extends StatelessWidget {
                       child: Text(
                         option.text,
                         style: TextStyle(
-                          color: isSelected ? Colors.white : GameQuizColors.textSecondary,
+                          color: isSelected
+                              ? Colors.white
+                              : GameQuizColors.textSecondary,
                           fontSize: 18,
-                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                          fontWeight: isSelected
+                              ? FontWeight.w700
+                              : FontWeight.w500,
                         ),
                       ),
                     ),

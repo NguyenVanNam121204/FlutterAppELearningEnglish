@@ -29,45 +29,38 @@ void main() {
     await cleanupTestUserProgress();
   });
 
-  group(
-    'KỊCH BẢN E2E: ĐĂNG NHẬP → HỌC BÀI → LÀM QUIZ → ÔN TẬP TỪ VỰNG',
-    () {
-      testWidgets(
-        'Kiểm thử luồng học tập khép kín của học viên',
-        (WidgetTester tester) async {
-          // Khởi chạy ứng dụng thật và chờ khởi tạo xong
-          await app.main();
+  group('KỊCH BẢN E2E: ĐĂNG NHẬP → HỌC BÀI → LÀM QUIZ → ÔN TẬP TỪ VỰNG', () {
+    testWidgets('Kiểm thử luồng học tập khép kín của học viên', (
+      WidgetTester tester,
+    ) async {
+      // Khởi chạy ứng dụng thật và chờ khởi tạo xong
+      await app.main();
 
-          // Chờ màn hình đầu tiên render: login form HOẶC home
-          // (dùng waitForAny vì Flutter test không có Finder.or())
-          await waitForAny(
-            tester,
-            [
-              find.byKey(const ValueKey('email-field')),
-              find.byTooltip('Khóa học'),
-            ],
-            timeout: const Duration(seconds: 30),
-            reason: 'App không khởi động được trong 30 giây',
-          );
-
-          // ── BƯỚC 1: Đăng nhập (nếu chưa đăng nhập) ──────────
-          await runAuthFlow(tester);
-
-          // ── BƯỚC 2+3: Chọn khóa học & học Flashcard ──────────
-          await runFlashcardFlow(tester);
-
-          // ── BƯỚC 4: Làm Quiz và xem kết quả ──────────────────
-          await runQuizFlow(tester);
-
-          // ── BƯỚC 5: Ôn tập từ vựng ───────────────────────────
-          await runReviewFlow(tester);
-
-          debugPrint('');
-          debugPrint('╔══════════════════════════════════════════╗');
-          debugPrint('║  ALL FLOWS PASSED - E2E COMPLETE         ║');
-          debugPrint('╚══════════════════════════════════════════╝');
-        },
+      // Chờ màn hình đầu tiên render: login form HOẶC home
+      // (dùng waitForAny vì Flutter test không có Finder.or())
+      await waitForAny(
+        tester,
+        [find.byKey(const ValueKey('email-field')), find.byTooltip('Khóa học')],
+        timeout: const Duration(seconds: 30),
+        reason: 'App không khởi động được trong 30 giây',
       );
-    },
-  );
+
+      // ── BƯỚC 1: Đăng nhập (nếu chưa đăng nhập) ──────────
+      await runAuthFlow(tester);
+
+      // ── BƯỚC 2+3: Chọn khóa học & học Flashcard ──────────
+      await runFlashcardFlow(tester);
+
+      // ── BƯỚC 4: Làm Quiz và xem kết quả ──────────────────
+      await runQuizFlow(tester);
+
+      // ── BƯỚC 5: Ôn tập từ vựng ───────────────────────────
+      await runReviewFlow(tester);
+
+      debugPrint('');
+      debugPrint('╔══════════════════════════════════════════╗');
+      debugPrint('║  ALL FLOWS PASSED - E2E COMPLETE         ║');
+      debugPrint('╚══════════════════════════════════════════╝');
+    });
+  });
 }

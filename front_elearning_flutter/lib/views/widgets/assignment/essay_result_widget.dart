@@ -115,7 +115,9 @@ class EssayResultWidget extends StatelessWidget {
             children: [
               Text(
                 instruction,
-                style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color),
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
+                ),
               ),
               if (audioUrl != null) ...[
                 const SizedBox(height: 12),
@@ -141,10 +143,10 @@ class EssayResultWidget extends StatelessWidget {
                   child: CachedNetworkImage(
                     imageUrl: imageUrl!,
                     fit: BoxFit.cover,
-                    placeholder: (context, url) => const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                    errorWidget: (context, url, error) => const Icon(Icons.broken_image),
+                    placeholder: (context, url) =>
+                        const Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.broken_image),
                   ),
                 ),
               ],
@@ -161,7 +163,9 @@ class EssayResultWidget extends StatelessWidget {
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+            border: Border.all(
+              color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,7 +177,9 @@ class EssayResultWidget extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 15,
                   height: 1.5,
-                  color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.9),
+                  color: Theme.of(
+                    context,
+                  ).textTheme.bodyLarge?.color?.withValues(alpha: 0.9),
                 ),
               ),
               if (submission.attachmentUrl != null) ...[
@@ -194,11 +200,14 @@ class EssayResultWidget extends StatelessWidget {
                   onTap: () async {
                     final fullUrl = submission.fullAttachmentUrl;
                     if (fullUrl == null) return;
-                    
+
                     final url = Uri.parse(fullUrl);
                     try {
                       if (await canLaunchUrl(url)) {
-                        await launchUrl(url, mode: LaunchMode.externalApplication);
+                        await launchUrl(
+                          url,
+                          mode: LaunchMode.externalApplication,
+                        );
                       } else {
                         // Fallback to internal browser if external fails
                         await launchUrl(url, mode: LaunchMode.platformDefault);
@@ -213,16 +222,24 @@ class EssayResultWidget extends StatelessWidget {
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+                      border: Border.all(
+                        color: Theme.of(
+                          context,
+                        ).dividerColor.withValues(alpha: 0.1),
+                      ),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.description_outlined,
-                            color: Color(0xFF475569)),
+                        const Icon(
+                          Icons.description_outlined,
+                          color: Color(0xFF475569),
+                        ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
@@ -230,12 +247,17 @@ class EssayResultWidget extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: Theme.of(context).textTheme.bodyLarge?.color,
+                              color: Theme.of(
+                                context,
+                              ).textTheme.bodyLarge?.color,
                             ),
                           ),
                         ),
-                        Icon(Icons.open_in_new_rounded,
-                            size: 18, color: Colors.blue.shade600),
+                        Icon(
+                          Icons.open_in_new_rounded,
+                          size: 18,
+                          color: Colors.blue.shade600,
+                        ),
                       ],
                     ),
                   ),
@@ -255,14 +277,18 @@ class EssayResultWidget extends StatelessWidget {
             decoration: BoxDecoration(
               color: Theme.of(context).cardColor.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+              border: Border.all(
+                color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+              ),
             ),
             child: Text(
               submission.feedback!,
               style: TextStyle(
                 fontSize: 14,
                 fontStyle: FontStyle.italic,
-                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
               ),
             ),
           ),
@@ -306,7 +332,9 @@ class _SectionTitle extends StatelessWidget {
         style: TextStyle(
           fontWeight: FontWeight.w800,
           fontSize: 14,
-          color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
+          color: Theme.of(
+            context,
+          ).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
           letterSpacing: 0.5,
         ),
       ),

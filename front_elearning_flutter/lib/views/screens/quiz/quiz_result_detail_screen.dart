@@ -6,10 +6,7 @@ import '../../../models/quiz/quiz_models.dart';
 import '../../../viewmodels/quiz/quiz_result_detail_viewmodel.dart';
 
 class QuizResultDetailScreen extends ConsumerWidget {
-  const QuizResultDetailScreen({
-    super.key,
-    required this.attemptId,
-  });
+  const QuizResultDetailScreen({super.key, required this.attemptId});
 
   final String attemptId;
 
@@ -19,7 +16,9 @@ class QuizResultDetailScreen extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      backgroundColor: isDark
+          ? const Color(0xFF0F172A)
+          : const Color(0xFFF8FAFC),
       appBar: AppBar(
         title: Text(
           'Chi tiết bài làm',
@@ -32,16 +31,21 @@ class QuizResultDetailScreen extends ConsumerWidget {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, 
-            color: isDark ? Colors.white : const Color(0xFF1E293B), size: 20),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: isDark ? Colors.white : const Color(0xFF1E293B),
+            size: 20,
+          ),
           onPressed: () => context.pop(),
         ),
       ),
       body: state.isLoading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFF40C4D8)))
+          ? const Center(
+              child: CircularProgressIndicator(color: Color(0xFF40C4D8)),
+            )
           : state.errorMessage != null
-              ? _buildErrorState(state.errorMessage!)
-              : _buildContent(context, state.result!),
+          ? _buildErrorState(state.errorMessage!)
+          : _buildContent(context, state.result!),
     );
   }
 
@@ -50,10 +54,8 @@ class QuizResultDetailScreen extends ConsumerWidget {
       physics: const BouncingScrollPhysics(),
       slivers: [
         // Summary Header
-        SliverToBoxAdapter(
-          child: _buildSummaryHeader(context, result),
-        ),
-        
+        SliverToBoxAdapter(child: _buildSummaryHeader(context, result)),
+
         // Questions List Header
         SliverToBoxAdapter(
           child: Padding(
@@ -74,35 +76,39 @@ class QuizResultDetailScreen extends ConsumerWidget {
         SliverPadding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           sliver: SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                return _buildQuestionCard(context, result.questions[index], index + 1);
-              },
-              childCount: result.questions.length,
-            ),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              return _buildQuestionCard(
+                context,
+                result.questions[index],
+                index + 1,
+              );
+            }, childCount: result.questions.length),
           ),
         ),
-        
+
         const SliverToBoxAdapter(child: SizedBox(height: 40)),
       ],
     );
   }
 
-  Widget _buildSummaryHeader(BuildContext context, QuizAttemptResultModel result) {
+  Widget _buildSummaryHeader(
+    BuildContext context,
+    QuizAttemptResultModel result,
+  ) {
     final double percentage = result.percentage;
-    
-    // Consistent color logic: >= 80% Green, >= 50% Orange, < 50% Red
-    final Color themeColor = percentage >= 80 
-        ? const Color(0xFF10B981) 
-        : percentage >= 50 
-            ? const Color(0xFFF59E0B) 
-            : const Color(0xFFEF4444);
 
-    final Color secondaryColor = percentage >= 80 
-        ? const Color(0xFF059669) 
-        : percentage >= 50 
-            ? const Color(0xFFD97706) 
-            : const Color(0xFFDC2626);
+    // Consistent color logic: >= 80% Green, >= 50% Orange, < 50% Red
+    final Color themeColor = percentage >= 80
+        ? const Color(0xFF10B981)
+        : percentage >= 50
+        ? const Color(0xFFF59E0B)
+        : const Color(0xFFEF4444);
+
+    final Color secondaryColor = percentage >= 80
+        ? const Color(0xFF059669)
+        : percentage >= 50
+        ? const Color(0xFFD97706)
+        : const Color(0xFFDC2626);
 
     return Container(
       margin: const EdgeInsets.all(20),
@@ -164,11 +170,16 @@ class QuizResultDetailScreen extends ConsumerWidget {
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.3),
+                  ),
                 ),
                 child: Text(
                   '${result.percentage.toStringAsFixed(1)}%',
@@ -192,15 +203,19 @@ class QuizResultDetailScreen extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildSummaryStat(
-                  'Số câu đúng', 
-                  '${result.questions.where((q) => q.isCorrect).length}/${result.questions.length}', 
-                  Icons.check_circle_rounded
+                  'Số câu đúng',
+                  '${result.questions.where((q) => q.isCorrect).length}/${result.questions.length}',
+                  Icons.check_circle_rounded,
                 ),
-                Container(width: 1, height: 30, color: Colors.white.withValues(alpha: 0.2)),
+                Container(
+                  width: 1,
+                  height: 30,
+                  color: Colors.white.withValues(alpha: 0.2),
+                ),
                 _buildSummaryStat(
-                  'Thời gian', 
-                  '${result.timeSpentSeconds}s', 
-                  Icons.speed_rounded
+                  'Thời gian',
+                  '${result.timeSpentSeconds}s',
+                  Icons.speed_rounded,
                 ),
               ],
             ),
@@ -240,9 +255,15 @@ class QuizResultDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildQuestionCard(BuildContext context, QuestionReviewModel question, int index) {
+  Widget _buildQuestionCard(
+    BuildContext context,
+    QuestionReviewModel question,
+    int index,
+  ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentColor = question.isCorrect ? const Color(0xFF10B981) : const Color(0xFFEF4444);
+    final accentColor = question.isCorrect
+        ? const Color(0xFF10B981)
+        : const Color(0xFFEF4444);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
@@ -297,7 +318,9 @@ class QuizResultDetailScreen extends ConsumerWidget {
                         style: GoogleFonts.outfit(
                           fontSize: 17,
                           fontWeight: FontWeight.w700,
-                          color: isDark ? Colors.white : const Color(0xFF1E293B),
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF1E293B),
                           height: 1.4,
                         ),
                       ),
@@ -308,7 +331,9 @@ class QuizResultDetailScreen extends ConsumerWidget {
                 ),
                 const SizedBox(width: 8),
                 Icon(
-                  question.isCorrect ? Icons.check_circle_rounded : Icons.cancel_rounded,
+                  question.isCorrect
+                      ? Icons.check_circle_rounded
+                      : Icons.cancel_rounded,
                   color: accentColor,
                   size: 28,
                 ),
@@ -319,19 +344,28 @@ class QuizResultDetailScreen extends ConsumerWidget {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
             decoration: BoxDecoration(
-              color: isDark ? Colors.black.withValues(alpha: 0.2) : const Color(0xFFF8FAFC),
-              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
+              color: isDark
+                  ? Colors.black.withValues(alpha: 0.2)
+                  : const Color(0xFFF8FAFC),
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(24),
+              ),
             ),
             child: Row(
               children: [
-                Icon(Icons.stars_rounded, size: 16, color: accentColor.withValues(alpha: 0.6)),
+                Icon(
+                  Icons.stars_rounded,
+                  size: 16,
+                  color: accentColor.withValues(alpha: 0.6),
+                ),
                 const SizedBox(width: 8),
                 Text(
                   'Điểm: ${_formatScore(question.score)} / ${_formatScore(question.points)}',
                   style: GoogleFonts.outfit(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
-                    color: (isDark ? Colors.white : const Color(0xFF1E293B)).withValues(alpha: 0.6),
+                    color: (isDark ? Colors.white : const Color(0xFF1E293B))
+                        .withValues(alpha: 0.6),
                   ),
                 ),
               ],
@@ -342,21 +376,26 @@ class QuizResultDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildAnswerSection(BuildContext context, QuestionReviewModel question) {
+  Widget _buildAnswerSection(
+    BuildContext context,
+    QuestionReviewModel question,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildAnswerRow(
-          context, 
-          'CÂU TRẢ LỜI CỦA BẠN', 
+          context,
+          'CÂU TRẢ LỜI CỦA BẠN',
           question.userAnswerText ?? 'Chưa trả lời',
-          question.isCorrect ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+          question.isCorrect
+              ? const Color(0xFF10B981)
+              : const Color(0xFFEF4444),
         ),
         if (!question.isCorrect) ...[
           const SizedBox(height: 16),
           _buildAnswerRow(
-            context, 
-            'ĐÁP ÁN ĐÚNG', 
+            context,
+            'ĐÁP ÁN ĐÚNG',
             question.correctAnswerText ?? '-',
             const Color(0xFF10B981),
           ),
@@ -365,8 +404,12 @@ class QuizResultDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildAnswerRow(BuildContext context, String label, String value, Color valueColor) {
-    
+  Widget _buildAnswerRow(
+    BuildContext context,
+    String label,
+    String value,
+    Color valueColor,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

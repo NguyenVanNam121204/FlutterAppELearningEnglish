@@ -20,7 +20,8 @@ class MyCourseItemModel {
   final int completedLessons;
 
   factory MyCourseItemModel.fromJson(Map<String, dynamic> json) {
-    final rawProgress = json['progressPercentage'] ?? json['ProgressPercentage'];
+    final rawProgress =
+        json['progressPercentage'] ?? json['ProgressPercentage'];
     return MyCourseItemModel(
       courseId: (json['courseId'] ?? json['CourseId'] ?? '').toString(),
       title: (json['title'] ?? json['Title'] ?? 'Course').toString(),
@@ -29,7 +30,9 @@ class MyCourseItemModel {
       isEnrolled: (json['isEnrolled'] ?? json['IsEnrolled'] ?? true) as bool,
       progressPercentage: _toDouble(rawProgress) ?? 0,
       totalLessons: _toInt(json['totalLessons'] ?? json['TotalLessons']),
-      completedLessons: _toInt(json['completedLessons'] ?? json['CompletedLessons']),
+      completedLessons: _toInt(
+        json['completedLessons'] ?? json['CompletedLessons'],
+      ),
     );
   }
 

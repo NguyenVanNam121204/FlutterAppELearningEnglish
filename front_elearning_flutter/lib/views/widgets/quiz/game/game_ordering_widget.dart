@@ -72,7 +72,8 @@ class _GameOrderingWidgetState extends State<GameOrderingWidget> {
               ...currentOrder.asMap().entries.map((entry) {
                 final option = widget.options.firstWhere(
                   (o) => o.id == entry.value,
-                  orElse: () => GameOrderingOption(id: entry.value, text: entry.value),
+                  orElse: () =>
+                      GameOrderingOption(id: entry.value, text: entry.value),
                 );
                 return GestureDetector(
                   onTap: () => _removeItem(entry.key),
@@ -83,7 +84,7 @@ class _GameOrderingWidgetState extends State<GameOrderingWidget> {
           ),
         ),
         const SizedBox(height: 48),
-        
+
         // Options Zone
         const Text(
           "Chạm để sắp xếp thứ tự câu:",
@@ -110,13 +111,19 @@ class _GameOrderingWidgetState extends State<GameOrderingWidget> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: isOrdered ? GameQuizColors.primary.withValues(alpha: 0.2) : GameQuizColors.surface,
+        color: isOrdered
+            ? GameQuizColors.primary.withValues(alpha: 0.2)
+            : GameQuizColors.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isOrdered ? GameQuizColors.secondary : Colors.white.withValues(alpha: 0.2),
+          color: isOrdered
+              ? GameQuizColors.secondary
+              : Colors.white.withValues(alpha: 0.2),
           width: 1.5,
         ),
-        boxShadow: isOrdered ? GameQuizStyles.neonShadow(GameQuizColors.secondary) : null,
+        boxShadow: isOrdered
+            ? GameQuizStyles.neonShadow(GameQuizColors.secondary)
+            : null,
       ),
       child: Text(
         text,

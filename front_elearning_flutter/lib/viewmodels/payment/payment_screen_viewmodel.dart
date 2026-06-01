@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -160,4 +160,3 @@ class PaymentScreenViewModel extends StateNotifier<PaymentScreenState> {
     );
   }
 }
-

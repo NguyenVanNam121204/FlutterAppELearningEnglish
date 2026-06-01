@@ -1,4 +1,3 @@
-
 import '../helpers/test_helpers.dart';
 
 // ============================================================
@@ -45,10 +44,8 @@ Future<void> runReviewFlow(WidgetTester tester) async {
   } else if (tester.any(allDoneText) || tester.any(goHomeBtn)) {
     // TRẠNG THÁI B: Spaced Repetition - Từ mới học chưa đến hạn ôn
     // Hành vi hoàn toàn đúng của hệ thống!
-    debugPrint(
-        '--- TẤT CẢ TỪ VỰNG ĐÃ ĐƯỢC ÔN HÔM NAY (SPACED REPETITION) ---');
-    debugPrint(
-        '--- MÀN HÌNH HIỂN THỊ: "Tuyệt vời! Hãy quay lại ngày mai" ---');
+    debugPrint('--- TẤT CẢ TỪ VỰNG ĐÃ ĐƯỢC ÔN HÔM NAY (SPACED REPETITION) ---');
+    debugPrint('--- MÀN HÌNH HIỂN THỊ: "Tuyệt vời! Hãy quay lại ngày mai" ---');
 
     if (tester.any(goHomeBtn)) {
       await tapAndWaitForLoad(tester, goHomeBtn);

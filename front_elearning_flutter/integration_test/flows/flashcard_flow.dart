@@ -1,9 +1,7 @@
-
 import '../helpers/test_helpers.dart';
 import 'package:front_elearning_flutter/views/widgets/course/my_course_list_item.dart';
 import 'package:front_elearning_flutter/views/widgets/lesson/lesson_list_item_card.dart';
 import 'package:front_elearning_flutter/views/widgets/flashcard/flashcard_audio_button.dart';
-
 
 // ============================================================
 // BƯỚC 2 + 3: LUỒNG CHỌN KHÓA HỌC & HỌC FLASHCARD
@@ -149,7 +147,7 @@ Future<void> _learnAllFlashcards(WidgetTester tester) async {
 
       // C. Chờ âm thanh đọc xong (dựa vào trạng thái giao diện thay vì delay cứng)
       final playingAudioFinder = find.byTooltip('Dừng phát âm');
-      
+
       try {
         // Máy ảo có độ trễ tải âm thanh (buffered). Ta cho nó tối đa 3 giây để BẮT ĐẦU phát.
         // Khi loa thực sự bắt đầu phát, tooltip sẽ đổi thành 'Dừng phát âm'.
@@ -158,7 +156,7 @@ Future<void> _learnAllFlashcards(WidgetTester tester) async {
           playingAudioFinder,
           timeout: const Duration(seconds: 3),
         );
-        
+
         // Sau khi loa đã phát, ta chờ cho đến khi nó ĐỌC XONG (tooltip biến mất)
         await waitForGone(
           tester,
@@ -168,7 +166,9 @@ Future<void> _learnAllFlashcards(WidgetTester tester) async {
         );
       } catch (e) {
         // Nếu loa không thể khởi động (có thể do lỗi mạng tải file audio), ta bỏ qua để test không bị đứng
-        debugPrint('--- Loa không phản hồi hoặc không có file audio, bỏ qua chờ âm thanh ---');
+        debugPrint(
+          '--- Loa không phản hồi hoặc không có file audio, bỏ qua chờ âm thanh ---',
+        );
       }
 
       await tester.tap(cardFinder); // Lật lại mặt trước

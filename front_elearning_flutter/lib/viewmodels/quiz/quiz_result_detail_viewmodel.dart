@@ -29,31 +29,32 @@ class QuizResultDetailState {
 }
 
 class QuizResultDetailViewModel extends StateNotifier<QuizResultDetailState> {
-  QuizResultDetailViewModel(this._repository) : super(const QuizResultDetailState());
+  QuizResultDetailViewModel(this._repository)
+    : super(const QuizResultDetailState());
 
   final QuizRepository _repository;
 
   Future<void> initialize(String attemptId) async {
     state = state.copyWith(isLoading: true);
-    
+
     final response = await _repository.getAttemptResult(attemptId);
-    
+
     state = switch (response) {
-      Success(:final value) => state.copyWith(
-          isLoading: false,
-          result: value,
-        ),
+      Success(:final value) => state.copyWith(isLoading: false, result: value),
       Failure(:final error) => state.copyWith(
-          isLoading: false,
-          errorMessage: error.message,
-        ),
+        isLoading: false,
+        errorMessage: error.message,
+      ),
     };
   }
 }
 
 final quizResultDetailProvider = StateNotifierProvider.autoDispose
-    .family<QuizResultDetailViewModel, QuizResultDetailState, String>((ref, attemptId) {
-  final vm = QuizResultDetailViewModel(ref.read(quizRepositoryProvider));
-  vm.initialize(attemptId);
-  return vm;
-});
+    .family<QuizResultDetailViewModel, QuizResultDetailState, String>((
+      ref,
+      attemptId,
+    ) {
+      final vm = QuizResultDetailViewModel(ref.read(quizRepositoryProvider));
+      vm.initialize(attemptId);
+      return vm;
+    });

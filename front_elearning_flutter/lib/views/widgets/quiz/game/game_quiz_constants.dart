@@ -5,13 +5,13 @@ class GameQuizColors {
   static const Color surface = Color(0xFF1B1B3A);
   static const Color primary = Color(0xFF7B61FF); // Neon Violet
   static const Color secondary = Color(0xFF00F0FF); // Neon Blue
-  
+
   static const Color correct = Color(0xFF00FF94); // Neon Green
   static const Color incorrect = Color(0xFFFF3D71); // Neon Red
-  
+
   static const Color textPrimary = Colors.white;
   static const Color textSecondary = Color(0xFFA0A0C0);
-  
+
   static List<Color> bgGradient = [
     const Color(0xFF0F0C29),
     const Color(0xFF302B63),

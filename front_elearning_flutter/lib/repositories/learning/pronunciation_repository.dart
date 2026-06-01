@@ -67,9 +67,7 @@ class PronunciationRepository {
         audioFile = await MultipartFile.fromFile(filePath, filename: fileName);
       }
 
-      final formData = FormData.fromMap({
-        'file': audioFile,
-      });
+      final formData = FormData.fromMap({'file': audioFile});
 
       final uploadResponse = await _apiService.post(
         ApiConstants.sharedTempFile,

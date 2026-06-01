@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -13,7 +13,8 @@ class VerifyEmailOtpScreen extends ConsumerStatefulWidget {
   final String email;
 
   @override
-  ConsumerState<VerifyEmailOtpScreen> createState() => _VerifyEmailOtpScreenState();
+  ConsumerState<VerifyEmailOtpScreen> createState() =>
+      _VerifyEmailOtpScreenState();
 }
 
 class _VerifyEmailOtpScreenState extends ConsumerState<VerifyEmailOtpScreen> {
@@ -22,9 +23,9 @@ class _VerifyEmailOtpScreenState extends ConsumerState<VerifyEmailOtpScreen> {
         .read(authViewModelProvider.notifier)
         .verifyEmailOtp(email: widget.email, otpCode: otpCode);
     if (!mounted || !ok) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Xac thuc email thanh cong')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Xac thuc email thanh cong')));
     context.go(RoutePaths.login);
   }
 
@@ -51,4 +52,3 @@ class _VerifyEmailOtpScreenState extends ConsumerState<VerifyEmailOtpScreen> {
     );
   }
 }
-

@@ -1,4 +1,3 @@
-
 import '../helpers/test_helpers.dart';
 
 // ============================================================
@@ -35,10 +34,10 @@ Future<void> runAuthFlow(WidgetTester tester) async {
     timeout: const Duration(seconds: 15),
     reason: 'Không vào được màn hình Home sau đăng nhập',
   );
-  
+
   // Tự động đứng chờ API và Ảnh trên màn hình Home (nếu có) tải xong hoàn toàn
   await waitForLoading(tester, timeout: const Duration(seconds: 15));
-  
+
   debugPrint('--- ĐÃ VÀO MÀN HÌNH HOME VÀ TẢI XONG ẢNH ---');
   logFlowPass('Auth Flow');
 }

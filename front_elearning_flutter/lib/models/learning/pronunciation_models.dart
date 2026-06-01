@@ -233,15 +233,23 @@ class PronunciationAssessmentResultModel {
       completenessScore: toDouble(
         json['completenessScore'] ?? json['CompletenessScore'],
       ),
-      words: ((json['words'] ?? json['Words']) as List<dynamic>?)
-              ?.map((e) => WordPronunciationDetailModel.fromJson(e as Map<String, dynamic>))
+      words:
+          ((json['words'] ?? json['Words']) as List<dynamic>?)
+              ?.map(
+                (e) => WordPronunciationDetailModel.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
               .toList() ??
           <WordPronunciationDetailModel>[],
-      problemPhonemes: ((json['problemPhonemes'] ?? json['ProblemPhonemes']) as List<dynamic>?)
+      problemPhonemes:
+          ((json['problemPhonemes'] ?? json['ProblemPhonemes'])
+                  as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           <String>[],
-      strongPhonemes: ((json['strongPhonemes'] ?? json['StrongPhonemes']) as List<dynamic>?)
+      strongPhonemes:
+          ((json['strongPhonemes'] ?? json['StrongPhonemes']) as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           <String>[],
@@ -265,10 +273,17 @@ class WordPronunciationDetailModel {
   factory WordPronunciationDetailModel.fromJson(Map<String, dynamic> json) {
     return WordPronunciationDetailModel(
       word: (json['word'] ?? json['Word'] ?? '').toString(),
-      accuracyScore: double.tryParse((json['accuracyScore'] ?? json['AccuracyScore']).toString()) ?? 0,
+      accuracyScore:
+          double.tryParse(
+            (json['accuracyScore'] ?? json['AccuracyScore']).toString(),
+          ) ??
+          0,
       errorType: (json['errorType'] ?? json['ErrorType'] ?? 'None').toString(),
-      phonemes: ((json['phonemes'] ?? json['Phonemes']) as List<dynamic>?)
-              ?.map((e) => PhonemeDetailModel.fromJson(e as Map<String, dynamic>))
+      phonemes:
+          ((json['phonemes'] ?? json['Phonemes']) as List<dynamic>?)
+              ?.map(
+                (e) => PhonemeDetailModel.fromJson(e as Map<String, dynamic>),
+              )
               .toList() ??
           <PhonemeDetailModel>[],
     );
@@ -289,8 +304,13 @@ class PhonemeDetailModel {
   factory PhonemeDetailModel.fromJson(Map<String, dynamic> json) {
     return PhonemeDetailModel(
       phoneme: (json['phoneme'] ?? json['Phoneme'] ?? '').toString(),
-      phonemeDisplay: (json['phonemeDisplay'] ?? json['PhonemeDisplay'] ?? '').toString(),
-      accuracyScore: double.tryParse((json['accuracyScore'] ?? json['AccuracyScore']).toString()) ?? 0,
+      phonemeDisplay: (json['phonemeDisplay'] ?? json['PhonemeDisplay'] ?? '')
+          .toString(),
+      accuracyScore:
+          double.tryParse(
+            (json['accuracyScore'] ?? json['AccuracyScore']).toString(),
+          ) ??
+          0,
     );
   }
 }

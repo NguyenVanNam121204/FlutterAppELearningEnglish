@@ -30,7 +30,7 @@ class MyCourseListItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: isDark 
+            color: isDark
                 ? Colors.black.withValues(alpha: 0.3)
                 : const Color(0xFF0F172A).withValues(alpha: 0.05),
             blurRadius: 20,
@@ -63,25 +63,31 @@ class MyCourseListItem extends StatelessWidget {
                             width: 64,
                             height: 64,
                             decoration: BoxDecoration(
-                              color: isDark 
+                              color: isDark
                                   ? Colors.white.withValues(alpha: 0.05)
                                   : const Color(0xFFF1F5F9),
                               borderRadius: BorderRadius.circular(16),
                             ),
-                            child: item.imageUrl != null &&
+                            child:
+                                item.imageUrl != null &&
                                     item.imageUrl!.isNotEmpty
                                 ? ClipRRect(
                                     borderRadius: BorderRadius.circular(16),
                                     child: CachedNetworkImage(
                                       imageUrl: item.imageUrl!,
                                       fit: BoxFit.cover,
-                                      placeholder: (context, url) => const Center(
-                                        child: SizedBox(
-                                          width: 20, height: 20,
-                                          child: CircularProgressIndicator(strokeWidth: 2),
-                                        ),
-                                      ),
-                                      errorWidget: (context, url, error) => const Icon(Icons.broken_image),
+                                      placeholder: (context, url) =>
+                                          const Center(
+                                            child: SizedBox(
+                                              width: 20,
+                                              height: 20,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                              ),
+                                            ),
+                                          ),
+                                      errorWidget: (context, url, error) =>
+                                          const Icon(Icons.broken_image),
                                     ),
                                   )
                                 : const Icon(
@@ -99,7 +105,7 @@ class MyCourseListItem extends StatelessWidget {
                                 gradient: const LinearGradient(
                                   colors: [
                                     Color(0xFF0EA5E9),
-                                    Color(0xFF22C55E)
+                                    Color(0xFF22C55E),
                                   ],
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
@@ -109,7 +115,9 @@ class MyCourseListItem extends StatelessWidget {
                                   bottomRight: Radius.circular(10),
                                 ),
                                 border: Border.all(
-                                    color: theme.cardColor, width: 2),
+                                  color: theme.cardColor,
+                                  width: 2,
+                                ),
                               ),
                               child: Text(
                                 '${index + 1}',
@@ -142,10 +150,14 @@ class MyCourseListItem extends StatelessWidget {
                             const SizedBox(height: 6),
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
-                                color: isDark 
-                                    ? theme.colorScheme.primary.withValues(alpha: 0.1)
+                                color: isDark
+                                    ? theme.colorScheme.primary.withValues(
+                                        alpha: 0.1,
+                                      )
                                     : const Color(0xFFF0F9FF),
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -156,8 +168,10 @@ class MyCourseListItem extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
-                                  color: isDark 
-                                      ? theme.colorScheme.primary.withValues(alpha: 0.9)
+                                  color: isDark
+                                      ? theme.colorScheme.primary.withValues(
+                                          alpha: 0.9,
+                                        )
                                       : const Color(0xFF0284C7),
                                 ),
                               ),
@@ -201,7 +215,7 @@ class MyCourseListItem extends StatelessWidget {
                         height: 8,
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: isDark 
+                          color: isDark
                               ? Colors.white.withValues(alpha: 0.05)
                               : const Color(0xFFF1F5F9),
                           borderRadius: BorderRadius.circular(999),
@@ -211,7 +225,8 @@ class MyCourseListItem extends StatelessWidget {
                         duration: const Duration(milliseconds: 600),
                         curve: Curves.easeOutQuart,
                         height: 8,
-                        width: MediaQuery.of(context).size.width *
+                        width:
+                            MediaQuery.of(context).size.width *
                             0.75 *
                             normalizedProgress,
                         decoration: BoxDecoration(
@@ -221,8 +236,9 @@ class MyCourseListItem extends StatelessWidget {
                           borderRadius: BorderRadius.circular(999),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF0EA5E9)
-                                  .withValues(alpha: 0.3),
+                              color: const Color(
+                                0xFF0EA5E9,
+                              ).withValues(alpha: 0.3),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),

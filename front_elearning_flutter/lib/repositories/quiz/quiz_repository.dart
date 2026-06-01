@@ -89,12 +89,16 @@ class QuizRepository {
     String attemptId,
   ) async {
     try {
-      final response = await _apiService.get('user/quiz-attempts/result/$attemptId');
+      final response = await _apiService.get(
+        'user/quiz-attempts/result/$attemptId',
+      );
       return Success(QuizAttemptResultModel.fromJson(_asMap(response.data)));
     } on DioException catch (error) {
       return Failure(_mapDioException(error));
     } catch (_) {
-      return const Failure(AppError(message: 'Unable to load quiz result detail.'));
+      return const Failure(
+        AppError(message: 'Unable to load quiz result detail.'),
+      );
     }
   }
 
@@ -102,7 +106,9 @@ class QuizRepository {
     String quizId,
   ) async {
     try {
-      final response = await _apiService.get('user/quiz-attempts/history/$quizId');
+      final response = await _apiService.get(
+        'user/quiz-attempts/history/$quizId',
+      );
       final list = _asMapList(response.data);
       return Success(list.map(QuizHistoryItemModel.fromJson).toList());
     } on DioException catch (error) {

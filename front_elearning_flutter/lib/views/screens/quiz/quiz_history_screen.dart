@@ -23,14 +23,16 @@ class QuizHistoryScreen extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      backgroundColor: isDark
+          ? const Color(0xFF0F172A)
+          : const Color(0xFFF8FAFC),
       appBar: AppBar(
         title: Column(
           children: [
             Text(
               'Lịch sử làm bài',
               style: GoogleFonts.outfit(
-                fontWeight: FontWeight.w700, 
+                fontWeight: FontWeight.w700,
                 fontSize: 20,
                 color: isDark ? Colors.white : const Color(0xFF1E293B),
               ),
@@ -38,7 +40,7 @@ class QuizHistoryScreen extends ConsumerWidget {
             Text(
               quizTitle,
               style: GoogleFonts.outfit(
-                fontSize: 13, 
+                fontSize: 13,
                 color: Colors.grey,
                 fontWeight: FontWeight.w500,
               ),
@@ -49,22 +51,30 @@ class QuizHistoryScreen extends ConsumerWidget {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, 
-            color: isDark ? Colors.white : const Color(0xFF1E293B), size: 20),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: isDark ? Colors.white : const Color(0xFF1E293B),
+            size: 20,
+          ),
           onPressed: () => context.pop(),
         ),
       ),
       body: state.isLoading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFF40C4D8)))
+          ? const Center(
+              child: CircularProgressIndicator(color: Color(0xFF40C4D8)),
+            )
           : state.errorMessage != null
-              ? _buildErrorState(state.errorMessage!)
-              : state.history.isEmpty
-                  ? _buildEmptyState()
-                  : _buildHistoryList(context, state.history),
+          ? _buildErrorState(state.errorMessage!)
+          : state.history.isEmpty
+          ? _buildEmptyState()
+          : _buildHistoryList(context, state.history),
     );
   }
 
-  Widget _buildHistoryList(BuildContext context, List<QuizHistoryItemModel> history) {
+  Widget _buildHistoryList(
+    BuildContext context,
+    List<QuizHistoryItemModel> history,
+  ) {
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       physics: const BouncingScrollPhysics(),
@@ -75,17 +85,21 @@ class QuizHistoryScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHistoryCard(BuildContext context, QuizHistoryItemModel item, int index) {
+  Widget _buildHistoryCard(
+    BuildContext context,
+    QuizHistoryItemModel item,
+    int index,
+  ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isCompleted = item.isCompleted;
     final percentage = (item.totalScore / item.totalPossibleScore * 100);
-    
+
     // Determine color based on performance
-    final Color accentColor = percentage >= 80 
-        ? const Color(0xFF10B981) 
-        : percentage >= 50 
-            ? const Color(0xFFF59E0B) 
-            : const Color(0xFFEF4444);
+    final Color accentColor = percentage >= 80
+        ? const Color(0xFF10B981)
+        : percentage >= 50
+        ? const Color(0xFFF59E0B)
+        : const Color(0xFFEF4444);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
@@ -105,9 +119,11 @@ class QuizHistoryScreen extends ConsumerWidget {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: isCompleted 
-              ? () => context.push('${RoutePaths.quizResultDetail}?attemptId=${item.attemptId}')
-              : null,
+            onTap: isCompleted
+                ? () => context.push(
+                    '${RoutePaths.quizResultDetail}?attemptId=${item.attemptId}',
+                  )
+                : null,
             child: Stack(
               children: [
                 // Performance indicator bar on the left
@@ -118,7 +134,7 @@ class QuizHistoryScreen extends ConsumerWidget {
                   width: 6,
                   child: Container(color: accentColor),
                 ),
-                
+
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24, 20, 20, 20),
                   child: Column(
@@ -129,7 +145,10 @@ class QuizHistoryScreen extends ConsumerWidget {
                           Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
                                 decoration: BoxDecoration(
                                   color: accentColor.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(10),
@@ -146,7 +165,10 @@ class QuizHistoryScreen extends ConsumerWidget {
                               if (!isCompleted) ...[
                                 const SizedBox(width: 8),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: Colors.blue.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(10),
@@ -164,7 +186,9 @@ class QuizHistoryScreen extends ConsumerWidget {
                             ],
                           ),
                           Text(
-                            DateFormat('HH:mm - dd/MM/yyyy').format(item.startedAt.toLocal()),
+                            DateFormat(
+                              'HH:mm - dd/MM/yyyy',
+                            ).format(item.startedAt.toLocal()),
                             style: GoogleFonts.outfit(
                               fontSize: 12,
                               color: Colors.grey[500],
@@ -208,7 +232,9 @@ class QuizHistoryScreen extends ConsumerWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            color: isDark ? Colors.black.withValues(alpha: 0.2) : const Color(0xFFF8FAFC),
+                            color: isDark
+                                ? Colors.black.withValues(alpha: 0.2)
+                                : const Color(0xFFF8FAFC),
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
                               color: accentColor.withValues(alpha: 0.1),
@@ -227,7 +253,11 @@ class QuizHistoryScreen extends ConsumerWidget {
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              Icon(Icons.arrow_forward_rounded, size: 16, color: accentColor),
+                              Icon(
+                                Icons.arrow_forward_rounded,
+                                size: 16,
+                                color: accentColor,
+                              ),
                             ],
                           ),
                         ),
@@ -243,7 +273,14 @@ class QuizHistoryScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatItem(BuildContext context, String label, String value, String suffix, IconData icon, Color color) {
+  Widget _buildStatItem(
+    BuildContext context,
+    String label,
+    String value,
+    String suffix,
+    IconData icon,
+    Color color,
+  ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -306,12 +343,19 @@ class QuizHistoryScreen extends ConsumerWidget {
                 color: Colors.red.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.error_outline_rounded, size: 48, color: Colors.red),
+              child: const Icon(
+                Icons.error_outline_rounded,
+                size: 48,
+                color: Colors.red,
+              ),
             ),
             const SizedBox(height: 24),
             Text(
               'Đã có lỗi xảy ra',
-              style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.w700),
+              style: GoogleFonts.outfit(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
@@ -336,7 +380,11 @@ class QuizHistoryScreen extends ConsumerWidget {
               color: Colors.blue.withValues(alpha: 0.05),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.history_edu_rounded, size: 80, color: Colors.blue.withValues(alpha: 0.2)),
+            child: Icon(
+              Icons.history_edu_rounded,
+              size: 80,
+              color: Colors.blue.withValues(alpha: 0.2),
+            ),
           ),
           const SizedBox(height: 32),
           Text(

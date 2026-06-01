@@ -162,7 +162,7 @@ class QuizScreenViewModel extends StateNotifier<QuizScreenState> {
         ? resumeAttemptId
         : null;
     _forceStartNew = forceStartNew;
-    
+
     // Cancel any existing timers to prevent background sync for old attempts
     _timer?.cancel();
     for (final timer in _answerSyncTimers.values) {
@@ -380,7 +380,9 @@ class QuizScreenViewModel extends StateNotifier<QuizScreenState> {
       userAnswer: value,
     );
     if (result case Failure<void>(:final error)) {
-      state = state.copyWith(errorMessage: _mapResumeFailureMessage(error.message));
+      state = state.copyWith(
+        errorMessage: _mapResumeFailureMessage(error.message),
+      );
     }
   }
 
@@ -488,7 +490,9 @@ class QuizScreenViewModel extends StateNotifier<QuizScreenState> {
     int? remaining;
     if (attempt.durationMinutes != null && attempt.durationMinutes! > 0) {
       if (attempt.startedAt != null) {
-        final endTime = attempt.startedAt!.add(Duration(minutes: attempt.durationMinutes!));
+        final endTime = attempt.startedAt!.add(
+          Duration(minutes: attempt.durationMinutes!),
+        );
         final diff = endTime.difference(DateTime.now().toUtc()).inSeconds;
         remaining = diff > 0 ? diff : 0;
       } else {
@@ -510,7 +514,8 @@ class QuizScreenViewModel extends StateNotifier<QuizScreenState> {
 
   String _mapResumeFailureMessage(String message) {
     final lowered = message.toLowerCase();
-    if (lowered.contains('not in progress') || lowered.contains('auto-submitted')) {
+    if (lowered.contains('not in progress') ||
+        lowered.contains('auto-submitted')) {
       return 'Bài làm này đã được nộp hoặc đã kết thúc trước đó.';
     }
     if (lowered.contains('time has expired') || lowered.contains('expired')) {

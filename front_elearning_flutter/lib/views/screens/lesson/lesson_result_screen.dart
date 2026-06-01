@@ -81,7 +81,9 @@ class _LessonResultCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final double scoreValue = double.tryParse(data.score) ?? 0.0;
     final bool isPassed = data.isPassed ?? (scoreValue >= 5.0);
-    final themeColor = isPassed ? const Color(0xFF10B981) : const Color(0xFFEF4444);
+    final themeColor = isPassed
+        ? const Color(0xFF10B981)
+        : const Color(0xFFEF4444);
 
     return Container(
       width: double.infinity,
@@ -90,10 +92,7 @@ class _LessonResultCard extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            themeColor.withValues(alpha: 0.1),
-            Colors.white,
-          ],
+          colors: [themeColor.withValues(alpha: 0.1), Colors.white],
         ),
       ),
       child: SafeArea(
@@ -109,7 +108,9 @@ class _LessonResultCard extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  isPassed ? Icons.emoji_events_rounded : Icons.sentiment_very_dissatisfied_rounded,
+                  isPassed
+                      ? Icons.emoji_events_rounded
+                      : Icons.sentiment_very_dissatisfied_rounded,
                   size: 60,
                   color: themeColor,
                 ),
@@ -124,18 +125,23 @@ class _LessonResultCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                isPassed ? 'Bạn đã hoàn thành xuất sắc bài tập' : 'Hãy luyện tập thêm để đạt kết quả tốt hơn',
+                isPassed
+                    ? 'Bạn đã hoàn thành xuất sắc bài tập'
+                    : 'Hãy luyện tập thêm để đạt kết quả tốt hơn',
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey[600],
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
               ),
               const SizedBox(height: 20),
 
               // Score Card
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 24,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(30),
@@ -161,10 +167,11 @@ class _LessonResultCard extends StatelessWidget {
                     const SizedBox(height: 12),
                     Text(
                       data.score,
-                      style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                        fontWeight: FontWeight.w900,
-                        color: Colors.black87,
-                      ),
+                      style: Theme.of(context).textTheme.headlineLarge
+                          ?.copyWith(
+                            fontWeight: FontWeight.w900,
+                            color: Colors.black87,
+                          ),
                     ),
                     const SizedBox(height: 24),
                     const Divider(),
@@ -294,10 +301,7 @@ class _ResultStatRow extends StatelessWidget {
         const Spacer(),
         Text(
           value,
-          style: const TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 16,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
         ),
       ],
     );

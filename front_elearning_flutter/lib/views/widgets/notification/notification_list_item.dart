@@ -32,8 +32,10 @@ class NotificationListItem extends StatelessWidget {
         color: isRead
             ? null
             : (isDark
-                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.15)
-                : const Color(0xFFF0F7FF)),
+                  ? Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.15)
+                  : const Color(0xFFF0F7FF)),
         padding: const EdgeInsets.all(12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,4 +93,3 @@ class NotificationListItem extends StatelessWidget {
     );
   }
 }
-

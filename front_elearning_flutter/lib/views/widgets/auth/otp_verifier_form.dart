@@ -47,7 +47,7 @@ class _OtpVerifierFormState extends State<OtpVerifierForm> {
     super.initState();
     _remainingSeconds = widget.initialSeconds;
     _startTimer();
-    
+
     for (int i = 0; i < _otpLength; i++) {
       _focusNodes[i].onKeyEvent = (FocusNode node, KeyEvent event) {
         if (event is KeyDownEvent &&
@@ -141,7 +141,7 @@ class _OtpVerifierFormState extends State<OtpVerifierForm> {
     }
 
     final digit = cleaned.substring(cleaned.length - 1);
-    
+
     // Update text and keep cursor at the end
     _controllers[index].value = TextEditingValue(
       text: digit,
@@ -260,4 +260,3 @@ class _OtpVerifierFormState extends State<OtpVerifierForm> {
     );
   }
 }
-

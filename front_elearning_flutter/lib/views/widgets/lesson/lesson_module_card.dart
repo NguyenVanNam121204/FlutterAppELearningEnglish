@@ -61,7 +61,8 @@ class LessonModuleCard extends StatelessWidget {
                         fit: BoxFit.cover,
                         placeholder: (context, url) => const Center(
                           child: SizedBox(
-                            width: 24, height: 24,
+                            width: 24,
+                            height: 24,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           ),
                         ),

@@ -47,15 +47,17 @@ class _GameFillInWidgetState extends State<GameFillInWidget> {
 
     for (final match in matches) {
       if (match.start > lastEnd) {
-        fragments.add(QuizFragment(
-          text: widget.content.substring(lastEnd, match.start),
-        ));
+        fragments.add(
+          QuizFragment(text: widget.content.substring(lastEnd, match.start)),
+        );
       }
-      fragments.add(QuizFragment(
-        text: match.group(1) ?? '',
-        isBlank: true,
-        blankIndex: blankCounter++,
-      ));
+      fragments.add(
+        QuizFragment(
+          text: match.group(1) ?? '',
+          isBlank: true,
+          blankIndex: blankCounter++,
+        ),
+      );
       lastEnd = match.end;
     }
 
@@ -76,7 +78,10 @@ class _GameFillInWidgetState extends State<GameFillInWidget> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
-      decoration: GameQuizStyles.glassDecoration(opacity: 0.1, borderRadius: 24),
+      decoration: GameQuizStyles.glassDecoration(
+        opacity: 0.1,
+        borderRadius: 24,
+      ),
       child: Wrap(
         spacing: 12,
         runSpacing: 24,
@@ -170,7 +175,7 @@ class _GameLetterBoxGroupState extends State<GameLetterBoxGroup> {
   Widget _buildLetterBox(int index) {
     final isFilled = _controllers[index].text.isNotEmpty;
     final isFocused = _focusNodes[index].hasFocus;
-    
+
     return Container(
       width: 26,
       height: 40,
@@ -180,7 +185,7 @@ class _GameLetterBoxGroupState extends State<GameLetterBoxGroup> {
         border: Border(
           bottom: BorderSide(
             color: (isFilled || isFocused)
-                ? GameQuizColors.secondary 
+                ? GameQuizColors.secondary
                 : GameQuizColors.secondary.withValues(alpha: 0.3),
             width: 3.0,
           ),
@@ -189,7 +194,7 @@ class _GameLetterBoxGroupState extends State<GameLetterBoxGroup> {
       child: KeyboardListener(
         focusNode: FocusNode(),
         onKeyEvent: (event) {
-          if (event is KeyDownEvent && 
+          if (event is KeyDownEvent &&
               event.logicalKey == LogicalKeyboardKey.backspace &&
               _controllers[index].text.isEmpty &&
               index > 0) {
@@ -205,7 +210,9 @@ class _GameLetterBoxGroupState extends State<GameLetterBoxGroup> {
           keyboardType: TextInputType.text,
           textCapitalization: TextCapitalization.characters,
           style: TextStyle(
-            color: (isFilled || isFocused) ? GameQuizColors.secondary : Colors.white,
+            color: (isFilled || isFocused)
+                ? GameQuizColors.secondary
+                : Colors.white,
             fontSize: 22,
             fontWeight: FontWeight.bold,
           ),

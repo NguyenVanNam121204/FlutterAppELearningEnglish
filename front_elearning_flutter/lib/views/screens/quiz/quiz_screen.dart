@@ -59,7 +59,10 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
         builder: (context) {
           return AlertDialog(
             backgroundColor: GameQuizColors.surface,
-            title: const Text('Chưa hoàn thành', style: TextStyle(color: Colors.white)),
+            title: const Text(
+              'Chưa hoàn thành',
+              style: TextStyle(color: Colors.white),
+            ),
             content: Text(
               'Bạn mới trả lời $answeredCount/$totalQuestions câu. Bạn có chắc muốn nộp bài?',
               style: const TextStyle(color: GameQuizColors.textSecondary),
@@ -71,8 +74,13 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
               ),
               FilledButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                style: FilledButton.styleFrom(backgroundColor: GameQuizColors.correct),
-                child: const Text('Nộp bài', style: TextStyle(color: Colors.black)),
+                style: FilledButton.styleFrom(
+                  backgroundColor: GameQuizColors.correct,
+                ),
+                child: const Text(
+                  'Nộp bài',
+                  style: TextStyle(color: Colors.black),
+                ),
               ),
             ],
           );
@@ -102,32 +110,35 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
       quizScreenViewModelProvider(widget.quizId).notifier,
     );
 
-    ref.listen<QuizScreenState>(
-      quizScreenViewModelProvider(widget.quizId),
-      (prev, next) {
-        if (prev != null &&
-            prev.errorMessage != next.errorMessage &&
-            (next.errorMessage?.isNotEmpty ?? false) &&
-            next.questions.isNotEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              backgroundColor: GameQuizColors.incorrect,
-              content: Text(next.errorMessage!, style: const TextStyle(color: Colors.white)),
+    ref.listen<QuizScreenState>(quizScreenViewModelProvider(widget.quizId), (
+      prev,
+      next,
+    ) {
+      if (prev != null &&
+          prev.errorMessage != next.errorMessage &&
+          (next.errorMessage?.isNotEmpty ?? false) &&
+          next.questions.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: GameQuizColors.incorrect,
+            content: Text(
+              next.errorMessage!,
+              style: const TextStyle(color: Colors.white),
             ),
-          );
-          notifier.clearError();
-        }
-        if (prev != null &&
-            prev.submittedAttemptId != next.submittedAttemptId &&
-            (next.submittedAttemptId?.isNotEmpty ?? false)) {
-          context.pushReplacement(
-            '${RoutePaths.lessonResult}?attemptId=${next.submittedAttemptId}',
-            extra: next.submittedResult,
-          );
-          notifier.clearSubmittedAttempt();
-        }
-      },
-    );
+          ),
+        );
+        notifier.clearError();
+      }
+      if (prev != null &&
+          prev.submittedAttemptId != next.submittedAttemptId &&
+          (next.submittedAttemptId?.isNotEmpty ?? false)) {
+        context.pushReplacement(
+          '${RoutePaths.lessonResult}?attemptId=${next.submittedAttemptId}',
+          extra: next.submittedResult,
+        );
+        notifier.clearSubmittedAttempt();
+      }
+    });
 
     return Scaffold(
       body: Container(
@@ -142,14 +153,21 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
           child: Builder(
             builder: (context) {
               if (state.isLoading) {
-                return const Center(child: CircularProgressIndicator(color: GameQuizColors.primary));
+                return const Center(
+                  child: CircularProgressIndicator(
+                    color: GameQuizColors.primary,
+                  ),
+                );
               }
-              
+
               if (state.questions.isEmpty) {
                 return _buildEmptyState(state, notifier);
               }
 
-              final clampedIndex = state.currentIndex.clamp(0, state.questions.length - 1);
+              final clampedIndex = state.currentIndex.clamp(
+                0,
+                state.questions.length - 1,
+              );
               final question = state.questions[clampedIndex];
               final questionId = question.questionId;
               final answer = state.answers[questionId];
@@ -158,7 +176,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
                 children: [
                   // Game Header
                   _buildGameHeader(state, notifier, clampedIndex),
-                  
+
                   // Question Card
                   Expanded(
                     child: SingleChildScrollView(
@@ -166,15 +184,20 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
                       child: GameQuizQuestionCard(
                         question: question,
                         answer: answer,
-                        onTextChanged: (v) => notifier.setTextAnswer(questionId, v),
-                        onToggleMulti: (optionId, checked) => notifier.toggleMultiAnswer(questionId, optionId, checked),
-                        onSelectSingle: (optionId) => notifier.setSingleAnswer(questionId, optionId),
-                        onSetMatching: (pairs) => notifier.setMatchingAnswer(questionId, pairs),
-                        onSetOrdering: (orderedIds) => notifier.setOrderingAnswer(questionId, orderedIds),
+                        onTextChanged: (v) =>
+                            notifier.setTextAnswer(questionId, v),
+                        onToggleMulti: (optionId, checked) => notifier
+                            .toggleMultiAnswer(questionId, optionId, checked),
+                        onSelectSingle: (optionId) =>
+                            notifier.setSingleAnswer(questionId, optionId),
+                        onSetMatching: (pairs) =>
+                            notifier.setMatchingAnswer(questionId, pairs),
+                        onSetOrdering: (orderedIds) =>
+                            notifier.setOrderingAnswer(questionId, orderedIds),
                       ),
                     ),
                   ),
-                  
+
                   // Bottom Controls
                   _buildBottomControls(state, notifier, clampedIndex),
                 ],
@@ -186,9 +209,15 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
     );
   }
 
-  Widget _buildGameHeader(QuizScreenState state, QuizScreenViewModel notifier, int currentIndex) {
+  Widget _buildGameHeader(
+    QuizScreenState state,
+    QuizScreenViewModel notifier,
+    int currentIndex,
+  ) {
     final progress = (currentIndex + 1) / state.questions.length;
-    final timeStr = state.remainingSeconds != null ? _formatRemaining(state.remainingSeconds!) : "--:--";
+    final timeStr = state.remainingSeconds != null
+        ? _formatRemaining(state.remainingSeconds!)
+        : "--:--";
     final isWarning = (state.remainingSeconds ?? 999) < 60;
 
     return Container(
@@ -208,26 +237,45 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
                     value: progress,
                     minHeight: 12,
                     backgroundColor: Colors.white.withValues(alpha: 0.1),
-                    valueColor: const AlwaysStoppedAnimation<Color>(GameQuizColors.primary),
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      GameQuizColors.primary,
+                    ),
                   ),
                 ),
               ),
               const SizedBox(width: 16),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  color: isWarning ? GameQuizColors.incorrect.withValues(alpha: 0.2) : Colors.white.withValues(alpha: 0.1),
+                  color: isWarning
+                      ? GameQuizColors.incorrect.withValues(alpha: 0.2)
+                      : Colors.white.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: isWarning ? GameQuizColors.incorrect : Colors.white24),
+                  border: Border.all(
+                    color: isWarning
+                        ? GameQuizColors.incorrect
+                        : Colors.white24,
+                  ),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.timer_outlined, size: 18, color: isWarning ? GameQuizColors.incorrect : Colors.white),
+                    Icon(
+                      Icons.timer_outlined,
+                      size: 18,
+                      color: isWarning
+                          ? GameQuizColors.incorrect
+                          : Colors.white,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       timeStr,
                       style: TextStyle(
-                        color: isWarning ? GameQuizColors.incorrect : Colors.white,
+                        color: isWarning
+                            ? GameQuizColors.incorrect
+                            : Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -239,14 +287,21 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
           const SizedBox(height: 8),
           Text(
             "Câu hỏi ${currentIndex + 1}/${state.questions.length}",
-            style: const TextStyle(color: GameQuizColors.textSecondary, fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              color: GameQuizColors.textSecondary,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildBottomControls(QuizScreenState state, QuizScreenViewModel notifier, int currentIndex) {
+  Widget _buildBottomControls(
+    QuizScreenState state,
+    QuizScreenViewModel notifier,
+    int currentIndex,
+  ) {
     final isLast = currentIndex == state.questions.length - 1;
 
     return Container(
@@ -261,7 +316,9 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   side: const BorderSide(color: Colors.white24),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
                 child: const Icon(Icons.arrow_back, color: Colors.white),
               ),
@@ -270,18 +327,26 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
           Expanded(
             flex: 3,
             child: FilledButton(
-              onPressed: isLast 
+              onPressed: isLast
                   ? () => _onSubmitPressed(state, notifier)
                   : notifier.nextQuestion,
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: isLast ? GameQuizColors.correct : GameQuizColors.primary,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                backgroundColor: isLast
+                    ? GameQuizColors.correct
+                    : GameQuizColors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 elevation: 8,
-                shadowColor: (isLast ? GameQuizColors.correct : GameQuizColors.primary).withValues(alpha: 0.5),
+                shadowColor:
+                    (isLast ? GameQuizColors.correct : GameQuizColors.primary)
+                        .withValues(alpha: 0.5),
               ),
               child: Text(
-                isLast ? (state.isSubmitting ? "Đang nộp..." : "NỘP BÀI") : "TIẾP THEO",
+                isLast
+                    ? (state.isSubmitting ? "Đang nộp..." : "NỘP BÀI")
+                    : "TIẾP THEO",
                 style: TextStyle(
                   color: isLast ? Colors.black : Colors.white,
                   fontWeight: FontWeight.w900,
@@ -303,17 +368,28 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.quiz_outlined, size: 80, color: GameQuizColors.primary),
+            const Icon(
+              Icons.quiz_outlined,
+              size: 80,
+              color: GameQuizColors.primary,
+            ),
             const SizedBox(height: 24),
             Text(
               state.quiz.title,
-              style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
             Text(
               state.errorMessage ?? "Sẵn sàng bắt đầu thử thách?",
-              style: const TextStyle(color: GameQuizColors.textSecondary, fontSize: 16),
+              style: const TextStyle(
+                color: GameQuizColors.textSecondary,
+                fontSize: 16,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 48),
@@ -324,15 +400,23 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 18),
                   backgroundColor: GameQuizColors.primary,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                 ),
-                child: const Text("BẮT ĐẦU LÀM BÀI", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                child: const Text(
+                  "BẮT ĐẦU LÀM BÀI",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
               ),
             ),
             const SizedBox(height: 16),
             TextButton(
               onPressed: _goBack,
-              child: const Text("Quay lại", style: TextStyle(color: GameQuizColors.textSecondary)),
+              child: const Text(
+                "Quay lại",
+                style: TextStyle(color: GameQuizColors.textSecondary),
+              ),
             ),
           ],
         ),

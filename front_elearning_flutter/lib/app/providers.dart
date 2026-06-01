@@ -60,19 +60,23 @@ final authSessionProvider = Provider<AuthSessionService>((ref) {
 });
 
 final refreshDioProvider = Provider<Dio>((ref) {
-  return Dio(BaseOptions(
-    baseUrl: AppConfig.apiBaseUrl,
-    connectTimeout: Duration(milliseconds: AppConfig.connectTimeoutMs),
-    receiveTimeout: Duration(milliseconds: AppConfig.receiveTimeoutMs),
-  ));
+  return Dio(
+    BaseOptions(
+      baseUrl: AppConfig.apiBaseUrl,
+      connectTimeout: Duration(milliseconds: AppConfig.connectTimeoutMs),
+      receiveTimeout: Duration(milliseconds: AppConfig.receiveTimeoutMs),
+    ),
+  );
 });
 
 final dioProvider = Provider<Dio>((ref) {
-  final dio = Dio(BaseOptions(
-    baseUrl: AppConfig.apiBaseUrl,
-    connectTimeout: Duration(milliseconds: AppConfig.connectTimeoutMs),
-    receiveTimeout: Duration(milliseconds: AppConfig.receiveTimeoutMs),
-  ));
+  final dio = Dio(
+    BaseOptions(
+      baseUrl: AppConfig.apiBaseUrl,
+      connectTimeout: Duration(milliseconds: AppConfig.connectTimeoutMs),
+      receiveTimeout: Duration(milliseconds: AppConfig.receiveTimeoutMs),
+    ),
+  );
   final refreshDio = ref.read(refreshDioProvider);
   dio.interceptors.add(
     AuthInterceptor(
@@ -421,12 +425,9 @@ final homeViewModelProvider = StateNotifierProvider<HomeViewModel, HomeState>((
 });
 
 final quizScreenViewModelProvider = StateNotifierProvider.autoDispose
-    .family<QuizScreenViewModel, QuizScreenState, String>((
-  ref,
-  quizId,
-) {
-  return QuizScreenViewModel(ref.read(quizRepositoryProvider));
-});
+    .family<QuizScreenViewModel, QuizScreenState, String>((ref, quizId) {
+      return QuizScreenViewModel(ref.read(quizRepositoryProvider));
+    });
 
 final flashcardLearningViewModelProvider =
     StateNotifierProvider.family<

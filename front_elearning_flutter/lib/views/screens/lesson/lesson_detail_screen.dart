@@ -144,7 +144,9 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen> {
                       '${RoutePaths.pronunciation}?moduleId=$moduleId',
                     );
                     if (context.mounted) {
-                      ref.invalidate(lessonDetailBundleProvider(widget.lessonId));
+                      ref.invalidate(
+                        lessonDetailBundleProvider(widget.lessonId),
+                      );
                     }
                   },
                 );

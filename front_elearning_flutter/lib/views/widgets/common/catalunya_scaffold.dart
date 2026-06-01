@@ -33,7 +33,7 @@ class CatalunyaScaffold extends StatelessWidget {
                   colors: [
                     Color(0xFFF3FBFF),
                     Color(0xFFF5F9FF),
-                    Color(0xFFF8FCFF)
+                    Color(0xFFF8FCFF),
                   ],
                 ),
         ),
@@ -42,4 +42,3 @@ class CatalunyaScaffold extends StatelessWidget {
     );
   }
 }
-

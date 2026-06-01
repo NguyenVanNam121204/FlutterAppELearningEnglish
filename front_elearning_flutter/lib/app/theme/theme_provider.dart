@@ -6,7 +6,9 @@ final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
   throw UnimplementedError();
 });
 
-final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>((ref) {
+final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>((
+  ref,
+) {
   final prefs = ref.watch(sharedPreferencesProvider);
   return ThemeModeNotifier(prefs);
 });

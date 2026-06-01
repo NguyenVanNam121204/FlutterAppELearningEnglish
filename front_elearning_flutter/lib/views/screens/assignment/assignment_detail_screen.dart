@@ -58,7 +58,9 @@ class _AssignmentDetailScreenState
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(18),
+              ),
             ),
             child: Column(
               children: [
@@ -174,8 +176,13 @@ class _AssignmentDetailScreenState
                             width: double.infinity,
                             child: OutlinedButton(
                               style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: Color(0xFF40C4D8), width: 1.5),
-                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                side: const BorderSide(
+                                  color: Color(0xFF40C4D8),
+                                  width: 1.5,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -186,8 +193,11 @@ class _AssignmentDetailScreenState
                                   '${RoutePaths.quiz}?quizId=$normalizedQuizId&attemptId=$activeAttemptId',
                                 );
                                 if (mounted) {
-                                  ref.invalidate(assignmentDetailProvider(
-                                      '${widget.assessmentId}::${widget.moduleId}'));
+                                  ref.invalidate(
+                                    assignmentDetailProvider(
+                                      '${widget.assessmentId}::${widget.moduleId}',
+                                    ),
+                                  );
                                 }
                               },
                               child: const Text(
@@ -221,7 +231,9 @@ class _AssignmentDetailScreenState
                                   builder: (c) => QuizActiveAttemptWarning(
                                     onContinueOld: () {
                                       Navigator.pop(c); // Close warning
-                                      Navigator.of(modalContext).pop(); // Close intro
+                                      Navigator.of(
+                                        modalContext,
+                                      ).pop(); // Close intro
                                       context.push(
                                         '${RoutePaths.quiz}?quizId=$normalizedQuizId&attemptId=$activeAttemptId',
                                       );
@@ -236,8 +248,11 @@ class _AssignmentDetailScreenState
                                 '${RoutePaths.quiz}?quizId=$normalizedQuizId',
                               );
                               if (mounted) {
-                                ref.invalidate(assignmentDetailProvider(
-                                    '${widget.assessmentId}::${widget.moduleId}'));
+                                ref.invalidate(
+                                  assignmentDetailProvider(
+                                    '${widget.assessmentId}::${widget.moduleId}',
+                                  ),
+                                );
                               }
                             },
                             child: Text(
@@ -399,7 +414,9 @@ class _AssignmentDetailScreenState
                             Container(
                               margin: const EdgeInsets.only(right: 8),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF40C4D8).withValues(alpha: 0.1),
+                                color: const Color(
+                                  0xFF40C4D8,
+                                ).withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: IconButton(
@@ -417,7 +434,11 @@ class _AssignmentDetailScreenState
                                 },
                               ),
                             ),
-                            const Icon(Icons.chevron_right_rounded, size: 20, color: Colors.grey),
+                            const Icon(
+                              Icons.chevron_right_rounded,
+                              size: 20,
+                              color: Colors.grey,
+                            ),
                           ],
                         ),
                         onTap: () => _showQuizIntro(q),
@@ -441,8 +462,8 @@ class _AssignmentDetailScreenState
                         title: e.title,
                         subtitle: e.isSubmitted
                             ? (e.isGraded
-                                ? 'Đã chấm: ${e.score} điểm'
-                                : 'Đã nộp bài')
+                                  ? 'Đã chấm: ${e.score} điểm'
+                                  : 'Đã nộp bài')
                             : 'Viết và nộp bài tự luận',
                         leading: Icon(
                           e.isSubmitted
@@ -455,8 +476,11 @@ class _AssignmentDetailScreenState
                             '${RoutePaths.essay}?essayId=${e.essayId}',
                           );
                           if (mounted) {
-                            ref.invalidate(assignmentDetailProvider(
-                                '${widget.assessmentId}::${widget.moduleId}'));
+                            ref.invalidate(
+                              assignmentDetailProvider(
+                                '${widget.assessmentId}::${widget.moduleId}',
+                              ),
+                            );
                           }
                         },
                       ),
@@ -486,7 +510,9 @@ class _QuizIntroTextBlock extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+        ),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -525,7 +551,9 @@ class _QuizStatCard extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor.withValues(alpha: 0.5),
-        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+        ),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -534,7 +562,9 @@ class _QuizStatCard extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
+              color: Theme.of(
+                context,
+              ).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
               fontWeight: FontWeight.w600,
             ),
           ),

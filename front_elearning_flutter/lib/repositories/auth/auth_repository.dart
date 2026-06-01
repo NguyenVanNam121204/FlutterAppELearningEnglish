@@ -175,10 +175,11 @@ class AuthRepository {
         }
       } else {
         // Xử lý custom response có field message hoặc Message
-        message = (responseData['message'] ??
-                responseData['Message'] ??
-                'Không thấy thông báo lỗi cụ thể nào')
-            .toString();
+        message =
+            (responseData['message'] ??
+                    responseData['Message'] ??
+                    'Không thấy thông báo lỗi cụ thể nào')
+                .toString();
       }
     }
 
