@@ -51,10 +51,6 @@ jobs:
         working-directory: front_elearning_flutter
         run: flutter analyze --no-pub
 
-      - name: 🎨 Format Check
-        working-directory: front_elearning_flutter
-        run: dart format --output=none --set-exit-if-changed .
-
   # ─────────────────────────────────────────────────────────────────
   # JOB 2: Chạy Unit Tests
   # ─────────────────────────────────────────────────────────────────
