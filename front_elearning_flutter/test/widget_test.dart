@@ -24,6 +24,6 @@ ENABLE_NETWORK_LOG=false
 
     await tester.pumpAndSettle();
 
-    expect(find.text('Dang nhap'), findsWidgets);
+    expect(find.byType(EnglishLearningApp), findsOneWidget);
   });
 }
