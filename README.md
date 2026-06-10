@@ -111,6 +111,7 @@ Dự án được trang bị hệ thống kiểm thử tự động toàn diện
 
 Để chạy kịch bản E2E tự động hóa trên máy ảo Android, bạn thực thi lệnh:
 ```bash
+cd front_elearning_flutter
 flutter test integration_test/app_test.dart
 ```
 
