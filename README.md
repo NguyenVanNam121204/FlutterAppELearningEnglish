@@ -1,6 +1,8 @@
-# Frontend E-Learning Flutter
+# Flutter App E-Learning English
 
-Ứng dụng frontend Flutter cho hệ thống học tiếng Anh, xây dựng theo kiến trúc MVVM kết hợp nguyên tắc Clean Architecture, tập trung vào tính nhất quán, khả năng mở rộng và dễ bảo trì.
+Dự án này chứa ứng dụng frontend Flutter cho hệ thống học tiếng Anh. Mã nguồn chính nằm trong thư mục `front_elearning_flutter`.
+
+Ứng dụng được xây dựng theo kiến trúc MVVM kết hợp nguyên tắc Clean Architecture, tập trung vào tính nhất quán, khả năng mở rộng và dễ bảo trì.
 
 ## Mục tiêu dự án
 
@@ -39,6 +41,8 @@
 
 ## Cấu trúc thư mục
 
+Mã nguồn được tổ chức trong thư mục `front_elearning_flutter/`:
+
 ```text
 lib/
 	app/            # config app, router, providers, theme
@@ -56,29 +60,33 @@ lib/
 
 ### 1. Yêu cầu môi trường
 
-- Flutter SDK: theo phiên bản trong [pubspec.yaml](pubspec.yaml)
+- Flutter SDK: theo phiên bản trong [front_elearning_flutter/pubspec.yaml](front_elearning_flutter/pubspec.yaml)
 - Dart SDK: theo Flutter SDK đi kèm
 
 ### 2. Cài dependencies
 
 ```bash
+cd front_elearning_flutter
 flutter pub get
 ```
 
 ### 3. Cấu hình môi trường
 
+- Vào thư mục `front_elearning_flutter`.
 - Tạo file `.env` từ mẫu `.env.example`.
 - Không commit thông tin nhạy cảm.
 
 ### 4. Chạy ứng dụng
 
 ```bash
+cd front_elearning_flutter
 flutter run
 ```
 
 Chạy web:
 
 ```bash
+cd front_elearning_flutter
 flutter run -d chrome
 ```
 
@@ -87,12 +95,14 @@ flutter run -d chrome
 ### 1. Phân tích static
 Đảm bảo mã nguồn tuân thủ các quy tắc chuẩn hóa và không có lỗi cú pháp:
 ```bash
+cd front_elearning_flutter
 flutter analyze
 ```
 
 ### 2. Chạy Unit & Widget Test
 Kiểm thử các đơn vị logic nghiệp vụ và giao diện cô lập:
 ```bash
+cd front_elearning_flutter
 flutter test
 ```
 
