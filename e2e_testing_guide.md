@@ -72,18 +72,27 @@ flowchart TD
 ## 🛠️ Hướng Dẫn Vận Hành (Running the Test)
 
 ### 1. Chuẩn bị môi trường
-* Đảm bảo Database PostgreSQL/MySQL đã khởi động.
-* Đảm bảo API Backend dotnet đang chạy:
+* **Backend E2E (Yêu cầu Docker):** Đảm bảo database và các service bổ trợ đã được khởi tạo sạch sẽ cho môi trường test:
   ```bash
-  cd BackendELearningEnglish\LearningEnglish.API
-  dotnet run
+  # Tại thư mục chứa cấu hình Docker của Backend
+  docker compose -f docker-compose.e2e.yml down -v
+  docker compose -f docker-compose.e2e.yml up -d
+
+  # Chạy server backend với profile E2E
+  dotnet run --launch-profile E2E
   ```
-* Khởi động máy ảo Android (Khuyên dùng emulator **Pixel 8 - Android 16 API 36**).
+* **Máy ảo Android:** Khởi động emulator (Khuyên dùng **Pixel 8 - Android 16 API 36**).
 
 ### 2. Chạy lệnh kiểm thử E2E
-Mở terminal trong thư mục `front_elearning_flutter` và thực thi:
+Di chuyển vào thư mục frontend và thực thi:
 ```bash
+cd front_elearning_flutter
 flutter test integration_test/app_test.dart
+```
+
+### 3. Dọn dẹp sau khi test
+```bash
+docker compose -f docker-compose.e2e.yml down -v
 ```
 
 ---

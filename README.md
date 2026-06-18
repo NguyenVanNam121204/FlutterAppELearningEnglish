@@ -1,6 +1,8 @@
-# Frontend E-Learning Flutter
+# Flutter App E-Learning English
 
-Ứng dụng frontend Flutter cho hệ thống học tiếng Anh, xây dựng theo kiến trúc MVVM kết hợp nguyên tắc Clean Architecture, tập trung vào tính nhất quán, khả năng mở rộng và dễ bảo trì.
+Dự án này chứa ứng dụng frontend Flutter cho hệ thống học tiếng Anh. Mã nguồn chính nằm trong thư mục `front_elearning_flutter`.
+
+Ứng dụng được xây dựng theo kiến trúc MVVM kết hợp nguyên tắc Clean Architecture, tập trung vào tính nhất quán, khả năng mở rộng và dễ bảo trì.
 
 ## Mục tiêu dự án
 
@@ -39,6 +41,8 @@
 
 ## Cấu trúc thư mục
 
+Mã nguồn được tổ chức trong thư mục `front_elearning_flutter/`:
+
 ```text
 lib/
 	app/            # config app, router, providers, theme
@@ -56,29 +60,33 @@ lib/
 
 ### 1. Yêu cầu môi trường
 
-- Flutter SDK: theo phiên bản trong [pubspec.yaml](pubspec.yaml)
+- Flutter SDK: theo phiên bản trong [front_elearning_flutter/pubspec.yaml](front_elearning_flutter/pubspec.yaml)
 - Dart SDK: theo Flutter SDK đi kèm
 
 ### 2. Cài dependencies
 
 ```bash
+cd front_elearning_flutter
 flutter pub get
 ```
 
 ### 3. Cấu hình môi trường
 
+- Vào thư mục `front_elearning_flutter`.
 - Tạo file `.env` từ mẫu `.env.example`.
 - Không commit thông tin nhạy cảm.
 
 ### 4. Chạy ứng dụng
 
 ```bash
+cd front_elearning_flutter
 flutter run
 ```
 
 Chạy web:
 
 ```bash
+cd front_elearning_flutter
 flutter run -d chrome
 ```
 
@@ -87,21 +95,41 @@ flutter run -d chrome
 ### 1. Phân tích static
 Đảm bảo mã nguồn tuân thủ các quy tắc chuẩn hóa và không có lỗi cú pháp:
 ```bash
+cd front_elearning_flutter
 flutter analyze
 ```
 
 ### 2. Chạy Unit & Widget Test
 Kiểm thử các đơn vị logic nghiệp vụ và giao diện cô lập:
 ```bash
+cd front_elearning_flutter
 flutter test
 ```
 
 ### 3. Kiểm thử tự động hóa đầu-cuối E2E (End-to-End Testing) 🚀
-Dự án được trang bị hệ thống kiểm thử tự động toàn diện tích hợp, giả lập 100% hành trình khép kín của học viên bao gồm: **Đăng nhập -> Học Flashcard (Nghe loa & Lật thẻ) -> Giải Quiz 13 câu (Tương tác cả 6 loại Game trắc nghiệm) -> Xem kết quả & Chi tiết bài làm -> Ôn tập từ vựng**.
+Dự án được trang bị hệ thống kiểm thử tự động toàn diện tích hợp, giả lập 100% hành trình khép kín của học viên. Để chạy E2E, bạn cần chuẩn bị môi trường backend và thực thi theo các bước sau:
 
-Để chạy kịch bản E2E tự động hóa trên máy ảo Android, bạn thực thi lệnh:
+**Bước 1: Khởi động Backend E2E (Yêu cầu Docker)**
+Chạy các lệnh sau tại thư mục backend (nơi chứa file docker và project .NET):
 ```bash
+# Xóa dữ liệu cũ và khởi động database/services chuyên biệt cho E2E
+docker compose -f docker-compose.e2e.yml down -v
+docker compose -f docker-compose.e2e.yml up -d
+
+# Chạy server backend với profile E2E
+dotnet run --launch-profile E2E
+```
+
+**Bước 2: Chạy kịch bản E2E trên Flutter**
+Sau khi Backend đã sẵn sàng, thực hiện lệnh tại thư mục frontend:
+```bash
+cd front_elearning_flutter
 flutter test integration_test/app_test.dart
+```
+
+**Bước 3: Dọn dẹp môi trường sau khi test**
+```bash
+docker compose -f docker-compose.e2e.yml down -v
 ```
 
 > [!TIP]
